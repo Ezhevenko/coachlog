@@ -9,23 +9,12 @@ import type { Client, Exercise } from './App'
 interface TrainingModeProps {
   client: Client
   day: string
+  date: string
   onBack: () => void
 }
 
-export function TrainingMode({ client, day, onBack }: TrainingModeProps) {
+export function TrainingMode({ client, day, date, onBack }: TrainingModeProps) {
   const apiFetch = useApiFetch()
-  const stubDate = (() => {
-    const map: Record<string, string> = {
-      'Понедельник': '2024-01-01',
-      'Вторник': '2024-01-02',
-      'Среда': '2024-01-03',
-      'Четверг': '2024-01-04',
-      'Пятница': '2024-01-05',
-      'Суббота': '2024-01-06',
-      'Воскресенье': '2024-01-07'
-    }
-    return map[day] || '2024-01-01'
-  })()
   const [workoutId, setWorkoutId] = useState<string | null>(null)
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [startTime, setStartTime] = useState<string>('')
@@ -41,7 +30,7 @@ export function TrainingMode({ client, day, onBack }: TrainingModeProps) {
 
   useEffect(() => {
     const load = async () => {
-      const res = await apiFetch('/api/coach/calendar?date=' + stubDate)
+      const res = await apiFetch('/api/coach/calendar?date=' + date)
       if (!res.ok) return
       const data = await res.json()
       const w = data.find((d: any) => d.clientId === client.id)
@@ -57,7 +46,7 @@ export function TrainingMode({ client, day, onBack }: TrainingModeProps) {
       }
     }
     load()
-  }, [client.id, stubDate])
+  }, [client.id, date])
 
   if (exercises.length === 0) {
     return (

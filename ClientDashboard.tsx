@@ -9,7 +9,7 @@ import type { Client } from './App'
 interface ClientDashboardProps {
   client: Client
   onBack: () => void
-  onOpenTraining: (day: string) => void
+  onOpenTraining: (day: string, date: string) => void
 }
 
 export function ClientDashboard({ client, onBack, onOpenTraining }: ClientDashboardProps) {
@@ -32,7 +32,13 @@ export function ClientDashboard({ client, onBack, onOpenTraining }: ClientDashbo
       </Tabs>
 
       <TabsContent value="schedule">
-        <TrainingProgram client={client} onBack={() => {}} onOpenTraining={onOpenTraining} onOpenEdit={() => {}} allowEdit={false} />
+        <TrainingProgram
+          client={client}
+          onBack={() => {}}
+          onOpenTraining={onOpenTraining}
+          onOpenEdit={(d, dt) => {}}
+          allowEdit={false}
+        />
       </TabsContent>
 
       <TabsContent value="progress">

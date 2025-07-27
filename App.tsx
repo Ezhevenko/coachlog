@@ -42,6 +42,7 @@ export default function App() {
   const [clients, setClients] = useState<Client[]>([])
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [selectedDay, setSelectedDay] = useState<string>('')
+  const [selectedDate, setSelectedDate] = useState<string>('')
   const [currentView, setCurrentView] = useState<View>('clients')
   const [activeRole, setActiveRole] = useState<Role>('coach')
   const apiFetch = useApiFetch()
@@ -162,13 +163,15 @@ export default function App() {
     setCurrentView('program')
   }
 
-  const openTrainingMode = (day: string) => {
+  const openTrainingMode = (day: string, date: string) => {
     setSelectedDay(day)
+    setSelectedDate(date)
     setCurrentView('training')
   }
 
-  const openEditMode = (day: string) => {
+  const openEditMode = (day: string, date: string) => {
     setSelectedDay(day)
+    setSelectedDate(date)
     setCurrentView('edit')
   }
 
@@ -230,6 +233,7 @@ export default function App() {
         <TrainingMode
           client={selectedClient}
           day={selectedDay}
+          date={selectedDate}
           onBack={goBack}
         />
       )}
@@ -238,6 +242,7 @@ export default function App() {
         <EditTrainingMode
           client={selectedClient}
           day={selectedDay}
+          date={selectedDate}
           allExercises={allExercises}
           onBack={goBack}
         />
