@@ -27,6 +27,7 @@ const WEEKDAYS = [
 export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, allowEdit = true }: TrainingProgramProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const apiFetch = useApiFetch()
+  // key is ISO date string (YYYY-MM-DD)
   const [program, setProgram] = useState<Record<string, { id: string, exercises: string[]; startTime?: string; duration?: number }>>({})
 
   useEffect(() => {
@@ -36,8 +37,9 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
       const data = await res.json()
       const map: Record<string, { id: string; exercises: string[]; startTime?: string; duration?: number }> = {}
       data.filter((w: any) => w.clientId === client.id).forEach((w: any) => {
-        const dayName = WEEKDAYS[new Date(w.date).getDay()]
-        map[dayName] = {
+        const dateStr = (w.date || '').slice(0, 10)
+        if (!dateStr) return
+        map[dateStr] = {
           id: w.id,
           exercises: w.exerciseIds || [],
           startTime: w.time_start || undefined,
@@ -49,16 +51,16 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
     load()
   }, [client.id])
 
-  // Получаем день недели для выбранной даты
+  // Получаем день недели и ключ даты в формате ISO
   const selectedDayName = WEEKDAYS[selectedDate.getDay()]
-  const selectedDayProgram = program[selectedDayName]
-  const exerciseCount = selectedDayProgram?.exercises.length || 0
   const selectedDateString = selectedDate.toISOString().slice(0, 10)
+  const selectedDayProgram = program[selectedDateString]
+  const exerciseCount = selectedDayProgram?.exercises.length || 0
 
   // Функция для определения, есть ли тренировки в конкретный день
   const hasTrainingOnDate = (date: Date) => {
-    const dayName = WEEKDAYS[date.getDay()]
-    const dayProgram = program[dayName]
+    const key = date.toISOString().slice(0, 10)
+    const dayProgram = program[key]
     return (dayProgram?.exercises.length || 0) > 0
   }
 
