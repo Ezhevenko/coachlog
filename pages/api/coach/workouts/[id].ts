@@ -10,9 +10,19 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
   }
   if (req.method === 'PATCH') {
     const { clientId, date, time_start, duration_minutes, rounds, exerciseIds } = req.body || {};
+    if (!time_start) {
+      res.status(400).json({ error: 'invalid data' });
+      return;
+    }
     const { error } = await supabase
       .from('workouts')
-      .update({ client_id: clientId, date, time_start, duration_minutes, rounds })
+      .update({
+        client_id: clientId,
+        date,
+        time_start,
+        duration_minutes: duration_minutes !== undefined ? Number(duration_minutes) : 60,
+        rounds,
+      })
       .eq('id', id);
     if (error) {
       res.status(500).json({ error: error.message });
@@ -22,7 +32,15 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
     for (let i = 0; i < (exerciseIds || []).length; i++) {
       await supabase.from('workout_exercises').insert({ workout_id: id, exercise_id: exerciseIds[i], order_index: i });
     }
-    res.status(200).json({ id, clientId, date, time_start, duration_minutes, rounds, exerciseIds });
+    res.status(200).json({
+      id,
+      clientId,
+      date,
+      time_start,
+      duration_minutes: duration_minutes !== undefined ? Number(duration_minutes) : 60,
+      rounds,
+      exerciseIds,
+    });
   } else if (req.method === 'DELETE') {
     await supabase.from('workouts').delete().eq('id', id);
     res.status(204).end();
