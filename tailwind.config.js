@@ -51,5 +51,16 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwindcss/plugin')(function ({ addUtilities }) {
+      addUtilities({
+        '.outline-ring': {
+          outlineColor: 'rgb(var(--color-ring))',
+        },
+        '.outline-ring\\/50': {
+          outlineColor: 'rgb(var(--color-ring) / 0.5)',
+        },
+      })
+    }),
+  ],
 }
