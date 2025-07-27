@@ -145,9 +145,6 @@ export function ClientList({ clients, onAddClient, onDeleteClient, onSelectClien
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-800">{client.name}</h3>
-                  <p className="text-sm text-gray-500">
-                    {client.program.reduce((acc, day) => acc + day.exercises.length, 0)} упражнений в программе
-                  </p>
                 </div>
               </div>
               

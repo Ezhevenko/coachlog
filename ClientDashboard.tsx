@@ -4,15 +4,16 @@ import { Button } from './ui/button'
 import { ArrowLeft } from 'lucide-react@0.487.0'
 import { TrainingProgram } from './TrainingProgram'
 import { ProgressView } from './ProgressView'
-import type { Client } from './App'
+import type { Client, Exercise } from './App'
 
 interface ClientDashboardProps {
   client: Client
+  allExercises: Omit<Exercise, 'currentWeight' | 'history'>[]
   onBack: () => void
   onOpenTraining: (day: string, date: string) => void
 }
 
-export function ClientDashboard({ client, onBack, onOpenTraining }: ClientDashboardProps) {
+export function ClientDashboard({ client, allExercises, onBack, onOpenTraining }: ClientDashboardProps) {
   const [tab, setTab] = useState('schedule')
 
   return (
@@ -42,7 +43,7 @@ export function ClientDashboard({ client, onBack, onOpenTraining }: ClientDashbo
       </TabsContent>
 
       <TabsContent value="progress">
-        <ProgressView client={client} />
+        <ProgressView client={client} allExercises={allExercises} />
       </TabsContent>
     </div>
   )

@@ -10,10 +10,11 @@ interface TrainingModeProps {
   client: Client
   day: string
   date: string
+  allExercises: Omit<Exercise, 'currentWeight' | 'history'>[]
   onBack: () => void
 }
 
-export function TrainingMode({ client, day, date, onBack }: TrainingModeProps) {
+export function TrainingMode({ client, day, date, allExercises, onBack }: TrainingModeProps) {
   const apiFetch = useApiFetch()
   const [workoutId, setWorkoutId] = useState<string | null>(null)
   const [exercises, setExercises] = useState<Exercise[]>([])
@@ -38,11 +39,14 @@ export function TrainingMode({ client, day, date, onBack }: TrainingModeProps) {
         setWorkoutId(w.id)
         setStartTime(w.time_start || '')
         setDuration(w.duration_minutes)
-        setExercises(w.exerciseIds.map((id: string) => {
-          const ex = client.program[0]?.exercises.find(e => e.id === id)
-          // fallback lookup from first client's list; may be empty
-          return ex ? { ...ex } : { id, name: id, category: 'other', currentWeight: 0, history: [] }
-        }))
+        setExercises(
+          w.exerciseIds.map((id: string) => {
+            const ex = allExercises.find(e => e.id === id)
+            return ex
+              ? { ...ex, currentWeight: 0, history: [] }
+              : { id, name: id, category: 'other', currentWeight: 0, history: [] }
+          })
+        )
       }
     }
     load()
