@@ -36,3 +36,4 @@ export const telegramUserMap: Record<string, string> = {};
 export const clients: Record<string, Client> = {};
 export const workouts: Record<string, Workout> = {};
 export const progress: Progress[] = [];
+export const activeRoles: Record<string, 'coach' | 'client'> = {};

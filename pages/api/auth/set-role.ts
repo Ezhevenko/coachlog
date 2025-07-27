@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { authMiddleware } from '../../../lib/auth';
-import { users } from '../../../lib/data';
+import { activeRoles } from '../../../lib/data';
 
 function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -13,8 +13,7 @@ function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
     return;
   }
   const user = req.user;
-  user.activeRole = role;
-  users[user.id] = user;
+  activeRoles[user.id] = role;
   res.status(200).json({ activeRole: role });
 }
 

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import jwt from 'jsonwebtoken';
-import { users, tokens } from './data';
+import { supabase } from './supabase';
 
 const SECRET = process.env.JWT_SECRET || 'changeme';
 
@@ -17,8 +17,8 @@ export function verifyToken(token: string) {
   }
 }
 
-export function authMiddleware(handler: (req: NextApiRequest & { user: any }, res: NextApiResponse) => void) {
-  return (req: NextApiRequest, res: NextApiResponse) => {
+export function authMiddleware(handler: (req: NextApiRequest & { user: any }, res: NextApiResponse) => void | Promise<void>) {
+  return async (req: NextApiRequest, res: NextApiResponse) => {
     const auth = req.headers.authorization;
     if (!auth || !auth.startsWith('Bearer ')) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -26,11 +26,16 @@ export function authMiddleware(handler: (req: NextApiRequest & { user: any }, re
     }
     const token = auth.slice(7);
     const userId = verifyToken(token);
-    if (!userId || !users[userId]) {
+    if (!userId) {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    (req as any).user = users[userId];
-    handler(req as any, res);
+    const { data: user } = await supabase.from('users').select('*').eq('id', userId).single();
+    if (!user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+    (req as any).user = user;
+    await handler(req as any, res);
   };
 }

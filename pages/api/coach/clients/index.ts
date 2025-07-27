@@ -1,11 +1,28 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { authMiddleware } from '../../../../lib/auth';
-import { clients } from '../../../../lib/data';
+import { supabase } from '../../../../lib/supabase';
 import crypto from 'crypto';
 
-function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
+async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
   if (req.method === 'GET') {
-    res.status(200).json(Object.values(clients));
+    const { data: links } = await supabase
+      .from('client_links')
+      .select('client_id')
+      .eq('coach_id', req.user.id);
+    const ids = links?.map(l => l.client_id) || [];
+    if (ids.length === 0) {
+      res.status(200).json([]);
+      return;
+    }
+    const { data: rows, error } = await supabase
+      .from('users')
+      .select('id, telegram_id, full_name')
+      .in('id', ids);
+    if (error) {
+      res.status(500).json({ error: error.message });
+      return;
+    }
+    res.status(200).json(rows || []);
   } else if (req.method === 'POST') {
     const { telegram_id, full_name } = req.body || {};
     if (!telegram_id || !full_name) {
@@ -13,8 +30,18 @@ function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
       return;
     }
     const id = crypto.randomUUID();
-    clients[id] = { id, telegram_id, full_name };
-    res.status(200).json(clients[id]);
+    const { data: created, error } = await supabase
+      .from('users')
+      .insert({ id, telegram_id, full_name })
+      .select('id, telegram_id, full_name')
+      .single();
+    if (error || !created) {
+      res.status(500).json({ error: error?.message || 'failed to create' });
+      return;
+    }
+    await supabase.from('user_roles').insert({ user_id: id, role: 'client' });
+    await supabase.from('client_links').insert({ client_id: id, coach_id: req.user.id });
+    res.status(200).json(created);
   } else {
     res.status(405).end();
   }
