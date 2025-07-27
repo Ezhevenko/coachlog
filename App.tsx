@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useApiFetch } from './lib/api'
+import { useAuthToken } from './lib/auth-context'
 import { ClientList } from './ClientList'
 import { TrainingProgram } from './TrainingProgram'
 import { TrainingMode } from './TrainingMode'
@@ -44,8 +45,10 @@ export default function App() {
   const [currentView, setCurrentView] = useState<View>('clients')
   const [activeRole, setActiveRole] = useState<Role>('coach')
   const apiFetch = useApiFetch()
+  const token = useAuthToken()
 
   useEffect(() => {
+    if (!token) return
     const load = async () => {
       const res = await apiFetch('/api/coach/clients')
       if (!res.ok) return
@@ -58,7 +61,7 @@ export default function App() {
       setClients(data.map((c: any) => ({ id: c.id, name: c.full_name, program: baseProgram })))
     }
     load()
-  }, [])
+  }, [token])
 
   // Система управления категориями упражнений
   const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>([
