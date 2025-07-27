@@ -10,6 +10,7 @@ interface TrainingProgramProps {
   onBack: () => void
   onOpenTraining: (day: string) => void
   onOpenEdit: (day: string) => void
+  allowEdit?: boolean
 }
 
 const WEEKDAYS = [
@@ -22,7 +23,7 @@ const WEEKDAYS = [
   'Суббота'
 ]
 
-export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit }: TrainingProgramProps) {
+export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, allowEdit = true }: TrainingProgramProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   
   // Получаем день недели для выбранной даты
@@ -135,25 +136,31 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit }: 
                 <Play className="w-5 h-5 mr-2" />
                 Начать тренировку
               </Button>
+              {allowEdit && (
+                <Button
+                  onClick={() => onOpenEdit(selectedDayName)}
+                  variant="outline"
+                  className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
+                  size="lg"
+                >
+                  <Edit3 className="w-4 h-4 mr-2" />
+                  Редактировать программу
+                </Button>
+              )}
+            </>
+          ) : (
+            allowEdit ? (
               <Button
                 onClick={() => onOpenEdit(selectedDayName)}
-                variant="outline"
-                className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
+                className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
                 size="lg"
               >
                 <Edit3 className="w-4 h-4 mr-2" />
-                Редактировать программу
+                Добавить программу
               </Button>
-            </>
-          ) : (
-            <Button
-              onClick={() => onOpenEdit(selectedDayName)}
-              className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
-              size="lg"
-            >
-              <Edit3 className="w-4 h-4 mr-2" />
-              Добавить программу
-            </Button>
+            ) : (
+              <p className="text-center text-gray-500">Нет программы</p>
+            )
           )}
         </div>
       </Card>
