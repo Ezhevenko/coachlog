@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useApiFetch } from './lib/api'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { Input } from './ui/input'
@@ -14,7 +15,6 @@ interface EditTrainingModeProps {
   day: string
   allExercises: Omit<Exercise, 'currentWeight' | 'history'>[]
   onBack: () => void
-  onUpdateProgram: (exercises: Exercise[], startTime?: string, duration?: number) => void
 }
 
 
@@ -223,23 +223,48 @@ function SortableExerciseItem({
   )
 }
 
-export function EditTrainingMode({ 
-  client, 
-  day, 
-  allExercises, 
-  onBack, 
-  onUpdateProgram 
+export function EditTrainingMode({
+  client,
+  day,
+  allExercises,
+  onBack
 }: EditTrainingModeProps) {
-  const dayProgram = client.program.find(p => p.day === day)
-  const [programExercises, setProgramExercises] = useState<Exercise[]>(
-    dayProgram?.exercises || []
-  )
-  const [startTime, setStartTime] = useState<string>(
-    dayProgram?.startTime || ''
-  )
-  const [duration, setDuration] = useState<string>(
-    dayProgram?.duration?.toString() || ''
-  )
+  const apiFetch = useApiFetch()
+  const stubDate = (() => {
+    const map: Record<string, string> = {
+      'Понедельник': '2024-01-01',
+      'Вторник': '2024-01-02',
+      'Среда': '2024-01-03',
+      'Четверг': '2024-01-04',
+      'Пятница': '2024-01-05',
+      'Суббота': '2024-01-06',
+      'Воскресенье': '2024-01-07'
+    }
+    return map[day] || '2024-01-01'
+  })()
+  const [workoutId, setWorkoutId] = useState<string | null>(null)
+  const [programExercises, setProgramExercises] = useState<Exercise[]>([])
+  const [startTime, setStartTime] = useState<string>('')
+  const [duration, setDuration] = useState<string>('')
+
+  useEffect(() => {
+    const load = async () => {
+      const res = await apiFetch('/api/coach/calendar?date=' + stubDate)
+      if (!res.ok) return
+      const data = await res.json()
+      const w = data.find((d: any) => d.clientId === client.id)
+      if (w) {
+        setWorkoutId(w.id)
+        setStartTime(w.time_start || '')
+        setDuration(w.duration_minutes ? String(w.duration_minutes) : '')
+        setProgramExercises(w.exerciseIds.map((id: string) => {
+          const ex = allExercises.find(e => e.id === id)
+          return ex ? { ...ex, currentWeight: 0, history: [] } : { id, name: id, category: 'other', currentWeight: 0, history: [] }
+        }))
+      }
+    }
+    load()
+  }, [client.id, stubDate])
 
   const exercisesByCategory = allExercises.reduce((acc, exercise) => {
     if (!acc[exercise.category]) {
@@ -271,10 +296,34 @@ export function EditTrainingMode({
     })
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const durationNum = duration ? parseInt(duration) : undefined
-    onUpdateProgram(programExercises, startTime || undefined, durationNum)
-    onBack()
+    const payload = {
+      clientId: client.id,
+      date: stubDate,
+      time_start: startTime,
+      duration_minutes: durationNum,
+      exerciseIds: programExercises.map(e => e.id)
+    }
+    let res
+    if (workoutId) {
+      res = await apiFetch(`/api/coach/workouts/${workoutId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+    } else {
+      res = await apiFetch('/api/coach/calendar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+    }
+    if (res.ok) {
+      const data = await res.json()
+      setWorkoutId(data.id)
+      onBack()
+    }
   }
 
   return (
