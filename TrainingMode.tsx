@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useApiFetch } from './lib/api'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Card } from './ui/card'
@@ -9,20 +10,54 @@ interface TrainingModeProps {
   client: Client
   day: string
   onBack: () => void
-  onUpdateWeight: (exerciseId: string, weight: number) => void
 }
 
-export function TrainingMode({ client, day, onBack, onUpdateWeight }: TrainingModeProps) {
-  const dayProgram = client.program.find(p => p.day === day)
-  const exercises = dayProgram?.exercises || []
-  
+export function TrainingMode({ client, day, onBack }: TrainingModeProps) {
+  const apiFetch = useApiFetch()
+  const stubDate = (() => {
+    const map: Record<string, string> = {
+      'Понедельник': '2024-01-01',
+      'Вторник': '2024-01-02',
+      'Среда': '2024-01-03',
+      'Четверг': '2024-01-04',
+      'Пятница': '2024-01-05',
+      'Суббота': '2024-01-06',
+      'Воскресенье': '2024-01-07'
+    }
+    return map[day] || '2024-01-01'
+  })()
+  const [workoutId, setWorkoutId] = useState<string | null>(null)
+  const [exercises, setExercises] = useState<Exercise[]>([])
+  const [startTime, setStartTime] = useState<string>('')
+  const [duration, setDuration] = useState<number | undefined>()
+
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0)
   const [newWeight, setNewWeight] = useState('')
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
   const [translateX, setTranslateX] = useState(0)
-  
+
   const cardRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const load = async () => {
+      const res = await apiFetch('/api/coach/calendar?date=' + stubDate)
+      if (!res.ok) return
+      const data = await res.json()
+      const w = data.find((d: any) => d.clientId === client.id)
+      if (w) {
+        setWorkoutId(w.id)
+        setStartTime(w.time_start || '')
+        setDuration(w.duration_minutes)
+        setExercises(w.exerciseIds.map((id: string) => {
+          const ex = client.program[0]?.exercises.find(e => e.id === id)
+          // fallback lookup from first client's list; may be empty
+          return ex ? { ...ex } : { id, name: id, category: 'other', currentWeight: 0, history: [] }
+        }))
+      }
+    }
+    load()
+  }, [client.id, stubDate])
 
   if (exercises.length === 0) {
     return (
@@ -121,11 +156,22 @@ export function TrainingMode({ client, day, onBack, onUpdateWeight }: TrainingMo
     }
   }
 
-  const handleSaveWeight = () => {
+  const handleSaveWeight = async () => {
     const weight = parseFloat(newWeight)
-    if (weight && weight > 0) {
-      onUpdateWeight(currentExercise.id, weight)
-      setNewWeight('')
+    if (weight && weight > 0 && workoutId) {
+      const res = await apiFetch(`/api/coach/workouts/${workoutId}/progress`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ exerciseId: currentExercise.id, round: currentExercise.history.length, weight })
+      })
+      if (res.ok) {
+        setExercises(prev => prev.map((ex, i) =>
+          i === currentExerciseIndex
+            ? { ...ex, currentWeight: weight, history: [...ex.history, { date: new Date().toISOString().split('T')[0], weight }] }
+            : ex
+        ))
+        setNewWeight('')
+      }
     }
   }
 
@@ -139,8 +185,8 @@ export function TrainingMode({ client, day, onBack, onUpdateWeight }: TrainingMo
           <h1 className="font-bold text-gray-800">{day}</h1>
           <p className="text-sm text-gray-500">
             {currentExerciseIndex + 1} из {exercises.length}
-            {dayProgram?.startTime && ` • ${dayProgram.startTime}`}
-            {dayProgram?.duration && ` • ${dayProgram.duration} мин`}
+            {startTime && ` • ${startTime}`}
+            {duration && ` • ${duration} мин`}
           </p>
         </div>
         <div className="w-10" />

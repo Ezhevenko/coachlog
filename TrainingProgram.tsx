@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useApiFetch } from './lib/api'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { Calendar } from './ui/calendar'
@@ -25,16 +26,38 @@ const WEEKDAYS = [
 
 export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, allowEdit = true }: TrainingProgramProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
-  
+  const apiFetch = useApiFetch()
+  const [program, setProgram] = useState<Record<string, { id: string, exercises: string[]; startTime?: string; duration?: number }>>({})
+
+  useEffect(() => {
+    const load = async () => {
+      const res = await apiFetch('/api/coach/calendar')
+      if (!res.ok) return
+      const data = await res.json()
+      const map: Record<string, { id: string; exercises: string[]; startTime?: string; duration?: number }> = {}
+      data.filter((w: any) => w.clientId === client.id).forEach((w: any) => {
+        const dayName = WEEKDAYS[new Date(w.date).getDay()]
+        map[dayName] = {
+          id: w.id,
+          exercises: w.exerciseIds || [],
+          startTime: w.time_start || undefined,
+          duration: w.duration_minutes || undefined
+        }
+      })
+      setProgram(map)
+    }
+    load()
+  }, [client.id])
+
   // Получаем день недели для выбранной даты
   const selectedDayName = WEEKDAYS[selectedDate.getDay()]
-  const selectedDayProgram = client.program.find(p => p.day === selectedDayName)
+  const selectedDayProgram = program[selectedDayName]
   const exerciseCount = selectedDayProgram?.exercises.length || 0
 
   // Функция для определения, есть ли тренировки в конкретный день
   const hasTrainingOnDate = (date: Date) => {
     const dayName = WEEKDAYS[date.getDay()]
-    const dayProgram = client.program.find(p => p.day === dayName)
+    const dayProgram = program[dayName]
     return (dayProgram?.exercises.length || 0) > 0
   }
 

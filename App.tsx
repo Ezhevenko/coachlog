@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useApiFetch } from './lib/api'
 import { ClientList } from './ClientList'
 import { TrainingProgram } from './TrainingProgram'
 import { TrainingMode } from './TrainingMode'
@@ -42,6 +43,22 @@ export default function App() {
   const [selectedDay, setSelectedDay] = useState<string>('')
   const [currentView, setCurrentView] = useState<View>('clients')
   const [activeRole, setActiveRole] = useState<Role>('coach')
+  const apiFetch = useApiFetch()
+
+  useEffect(() => {
+    const load = async () => {
+      const res = await apiFetch('/api/coach/clients')
+      if (!res.ok) return
+      const data = await res.json()
+      const days = [
+        'Понедельник', 'Вторник', 'Среда', 'Четверг',
+        'Пятница', 'Суббота', 'Воскресенье'
+      ]
+      const baseProgram = days.map(day => ({ day, exercises: [] as Exercise[] }))
+      setClients(data.map((c: any) => ({ id: c.id, name: c.full_name, program: baseProgram })))
+    }
+    load()
+  }, [])
 
   // Система управления категориями упражнений
   const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>([
@@ -112,62 +129,30 @@ export default function App() {
     }
   }
 
-  const addClient = (name: string) => {
-    const newClient: Client = {
-      id: Date.now().toString(),
-      name,
-      program: [
-        'Понедельник', 'Вторник', 'Среда', 'Четверг', 
-        'Пятница', 'Суббота', 'Воскресенье'
-      ].map(day => ({ day, exercises: [] }))
+  const addClient = async (name: string) => {
+    const res = await apiFetch('/api/coach/clients', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telegram_id: Date.now().toString(), full_name: name })
+    })
+    if (!res.ok) return
+    const data = await res.json()
+    const days = [
+      'Понедельник', 'Вторник', 'Среда', 'Четверг',
+      'Пятница', 'Суббота', 'Воскресенье'
+    ]
+    const baseProgram = days.map(d => ({ day: d, exercises: [] as Exercise[] }))
+    const newClient: Client = { id: data.id, name: data.full_name, program: baseProgram }
+    setClients(prev => [...prev, newClient])
+  }
+
+  const deleteClient = async (clientId: string) => {
+    const res = await apiFetch(`/api/coach/clients/${clientId}`, { method: 'DELETE' })
+    if (res.ok) {
+      setClients(prev => prev.filter(c => c.id !== clientId))
     }
-    setClients([...clients, newClient])
   }
 
-  const deleteClient = (clientId: string) => {
-    setClients(clients.filter(c => c.id !== clientId))
-  }
-
-  const updateClientProgram = (clientId: string, dayIndex: number, exercises: Exercise[], startTime?: string, duration?: number) => {
-    setClients(prev => prev.map(client => 
-      client.id === clientId 
-        ? {
-            ...client,
-            program: client.program.map((day, index) => 
-              index === dayIndex ? { ...day, exercises, startTime, duration } : day
-            )
-          }
-        : client
-    ))
-  }
-
-  const updateExerciseWeight = (exerciseId: string, newWeight: number) => {
-    if (!selectedClient) return
-    
-    const dayIndex = selectedClient.program.findIndex(d => d.day === selectedDay)
-    if (dayIndex === -1) return
-
-    const updatedExercises = selectedClient.program[dayIndex].exercises.map(exercise => 
-      exercise.id === exerciseId 
-        ? {
-            ...exercise,
-            currentWeight: newWeight,
-            history: [...exercise.history, { date: new Date().toISOString().split('T')[0], weight: newWeight }]
-          }
-        : exercise
-    )
-
-    const currentDayProgram = selectedClient.program[dayIndex]
-    updateClientProgram(selectedClient.id, dayIndex, updatedExercises, currentDayProgram.startTime, currentDayProgram.duration)
-    
-    // Обновляем локальное состояние selectedClient
-    setSelectedClient(prev => prev ? {
-      ...prev,
-      program: prev.program.map((day, index) => 
-        index === dayIndex ? { ...day, exercises: updatedExercises } : day
-      )
-    } : null)
-  }
 
   const openClientProgram = (client: Client) => {
     setSelectedClient(client)
@@ -243,7 +228,6 @@ export default function App() {
           client={selectedClient}
           day={selectedDay}
           onBack={goBack}
-          onUpdateWeight={updateExerciseWeight}
         />
       )}
       
@@ -253,10 +237,6 @@ export default function App() {
           day={selectedDay}
           allExercises={allExercises}
           onBack={goBack}
-          onUpdateProgram={(exercises, startTime, duration) => {
-            const dayIndex = selectedClient.program.findIndex(d => d.day === selectedDay)
-            updateClientProgram(selectedClient.id, dayIndex, exercises, startTime, duration)
-          }}
         />
       )}
 
