@@ -7,5 +7,5 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["*.ts", "*.tsx", "ui/**/*.ts", "ui/**/*.tsx"]
+  "include": ["*.ts", "*.tsx", "ui/**/*.ts", "ui/**/*.tsx", "pages/**/*.ts"]
 }
