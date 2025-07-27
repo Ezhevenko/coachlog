@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Card } from './ui/card'
-import { ArrowLeft, ChevronLeft, ChevronRight, TrendingUp, Save } from 'lucide-react'
+import { ArrowLeft, ChevronLeft, ChevronRight, TrendingUp, Save } from 'lucide-react@0.487.0'
 import type { Client, Exercise } from './App'
 
 interface TrainingModeProps {

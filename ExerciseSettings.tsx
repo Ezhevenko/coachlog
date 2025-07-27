@@ -6,7 +6,7 @@ import { Label } from './ui/label'
 import { Separator } from './ui/separator'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
-import { ArrowLeft, Plus, X, Edit3, Dumbbell, FolderPlus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Plus, X, Edit3, Dumbbell, FolderPlus, Trash2 } from 'lucide-react@0.487.0'
 import type { ExerciseCategory } from './App'
 
 interface ExerciseSettingsProps {

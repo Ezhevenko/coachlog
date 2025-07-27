@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Card } from './ui/card'
-import { Plus, Trash2, User, Settings } from 'lucide-react'
+import { Plus, Trash2, User, Settings } from 'lucide-react@0.487.0'
 import type { Client } from './App'
 
 interface ClientListProps {

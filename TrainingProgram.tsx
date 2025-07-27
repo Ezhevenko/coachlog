@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { Calendar } from './ui/calendar'
-import { ArrowLeft, Edit3, Play, Dumbbell, TrendingUp } from 'lucide-react'
+import { ArrowLeft, Edit3, Play, Dumbbell, TrendingUp } from 'lucide-react@0.487.0'
 import type { Client } from './App'
 
 interface TrainingProgramProps {
