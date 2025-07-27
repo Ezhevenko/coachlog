@@ -1,21 +1,46 @@
+import { useEffect, useState } from 'react'
 import { Card } from './ui/card'
-import type { Client } from './App'
+import { useApiFetch } from './lib/api'
+import type { Client, Exercise } from './App'
 
 interface ProgressViewProps {
   client: Client
+  allExercises: Omit<Exercise, 'currentWeight' | 'history'>[]
 }
+export function ProgressView({ client, allExercises }: ProgressViewProps) {
+  const apiFetch = useApiFetch()
+  const [exerciseMap, setExerciseMap] = useState<Record<string, { name: string; history: { date: string; weight: number }[] }>>({})
 
-export function ProgressView({ client }: ProgressViewProps) {
-  const exerciseMap: Record<string, { name: string; history: { date: string; weight: number }[] }> = {}
+  useEffect(() => {
+    const load = async () => {
+      const res = await apiFetch('/api/client/progress')
+      if (!res.ok) return
+      const progress = await res.json()
 
-  client.program.forEach(day => {
-    day.exercises.forEach(ex => {
-      if (!exerciseMap[ex.id]) {
-        exerciseMap[ex.id] = { name: ex.name, history: [] }
+      let workoutMap: Record<string, string> = {}
+      if (progress.length) {
+        const wres = await apiFetch('/api/client/calendar')
+        if (wres.ok) {
+          const workouts = await wres.json()
+          workoutMap = Object.fromEntries(workouts.map((w: any) => [w.id, (w.date || '').slice(0, 10)]))
+        }
       }
-      exerciseMap[ex.id].history = [...exerciseMap[ex.id].history, ...ex.history]
-    })
-  })
+
+      const map: Record<string, { name: string; history: { date: string; weight: number }[] }> = {}
+      progress.forEach((p: any) => {
+        const ex = allExercises.find(e => e.id === p.exercise_id)
+        if (!ex) return
+        const date = workoutMap[p.workout_id] || ''
+        if (!map[p.exercise_id]) {
+          map[p.exercise_id] = { name: ex.name, history: [] }
+        }
+        map[p.exercise_id].history.push({ date, weight: p.weight || 0 })
+      })
+
+      setExerciseMap(map)
+    }
+    load()
+  }, [apiFetch, client.id, allExercises])
 
   const exercises = Object.values(exerciseMap)
 

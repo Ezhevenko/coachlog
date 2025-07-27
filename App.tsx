@@ -23,17 +23,9 @@ export interface ExerciseCategory {
   exercises: Omit<Exercise, 'currentWeight' | 'history'>[]
 }
 
-export interface DayTraining {
-  day: string
-  exercises: Exercise[]
-  startTime?: string // время начала в формате "HH:MM"
-  duration?: number  // длительность в минутах
-}
-
 export interface Client {
   id: string
   name: string
-  program: DayTraining[]
 }
 
 type View = 'clients' | 'program' | 'training' | 'edit' | 'settings' | 'client'
@@ -54,12 +46,7 @@ export default function App() {
       const res = await apiFetch('/api/coach/clients')
       if (!res.ok) return
       const data = await res.json()
-      const days = [
-        'Понедельник', 'Вторник', 'Среда', 'Четверг',
-        'Пятница', 'Суббота', 'Воскресенье'
-      ]
-      const baseProgram = days.map(day => ({ day, exercises: [] as Exercise[] }))
-      setClients(data.map((c: any) => ({ id: c.id, name: c.full_name, program: baseProgram })))
+      setClients(data.map((c: any) => ({ id: c.id, name: c.full_name })))
     }
     load()
   }, [token])
@@ -141,12 +128,7 @@ export default function App() {
     })
     if (!res.ok) return
     const data = await res.json()
-    const days = [
-      'Понедельник', 'Вторник', 'Среда', 'Четверг',
-      'Пятница', 'Суббота', 'Воскресенье'
-    ]
-    const baseProgram = days.map(d => ({ day: d, exercises: [] as Exercise[] }))
-    const newClient: Client = { id: data.id, name: data.full_name, program: baseProgram }
+    const newClient: Client = { id: data.id, name: data.full_name }
     setClients(prev => [...prev, newClient])
   }
 
@@ -224,6 +206,7 @@ export default function App() {
       {activeRole === 'client' && currentView === 'client' && selectedClient && (
         <ClientDashboard
           client={selectedClient}
+          allExercises={allExercises}
           onBack={() => setCurrentView('client')}
           onOpenTraining={openTrainingMode}
         />
@@ -234,6 +217,7 @@ export default function App() {
           client={selectedClient}
           day={selectedDay}
           date={selectedDate}
+          allExercises={allExercises}
           onBack={goBack}
         />
       )}

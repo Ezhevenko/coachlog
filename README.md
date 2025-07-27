@@ -25,7 +25,12 @@ Open `http://localhost:3000` in your browser.
 
 ## Tests and Type Checking
 
-Run the basic import tests and TypeScript compilation:
+Install dependencies first:
+```bash
+npm install
+```
+
+Then run the basic import tests and TypeScript compilation:
 ```bash
 npm test
 npx tsc -p tsconfig.json
