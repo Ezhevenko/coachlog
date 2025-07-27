@@ -33,7 +33,7 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
   } else if (req.method === 'POST') {
     const { clientId, date, time_start, duration_minutes, rounds, exerciseIds } =
       req.body || {};
-    if (!clientId || !date || !Array.isArray(exerciseIds)) {
+    if (!clientId || !date || !Array.isArray(exerciseIds) || !time_start) {
       res.status(400).json({ error: 'invalid data' });
       return;
     }
@@ -44,10 +44,10 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
       date,
       rounds,
     };
-    if (time_start) insertData.time_start = time_start;
-    if (duration_minutes !== undefined) {
-      insertData.duration_minutes = Number(duration_minutes);
-    }
+    insertData.time_start = time_start;
+    insertData.duration_minutes = duration_minutes !== undefined
+      ? Number(duration_minutes)
+      : 60;
     const { error: insertErr } = await supabase.from('workouts').insert(insertData);
     if (insertErr) {
       res.status(500).json({ error: insertErr.message });
@@ -58,7 +58,7 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
         .from('workout_exercises')
         .insert({ workout_id: id, exercise_id: exerciseIds[i], order_index: i });
     }
-    res.status(201).json({ id, clientId, date, time_start, duration_minutes: duration_minutes !== undefined ? Number(duration_minutes) : undefined, rounds, exerciseIds });
+    res.status(201).json({ id, clientId, date, time_start, duration_minutes: duration_minutes !== undefined ? Number(duration_minutes) : 60, rounds, exerciseIds });
   } else {
     res.status(405).end();
   }

@@ -245,7 +245,7 @@ export function EditTrainingMode({
   const [workoutId, setWorkoutId] = useState<string | null>(null)
   const [programExercises, setProgramExercises] = useState<Exercise[]>([])
   const [startTime, setStartTime] = useState<string>('')
-  const [duration, setDuration] = useState<string>('')
+  const [duration, setDuration] = useState<string>('60')
 
   useEffect(() => {
     const load = async () => {
@@ -297,7 +297,8 @@ export function EditTrainingMode({
   }
 
   const handleSave = async () => {
-    const durationNum = duration ? parseInt(duration) : undefined
+    if (!startTime) return
+    const durationNum = duration ? parseInt(duration) : 60
     const payload = {
       clientId: client.id,
       date: stubDate,
@@ -340,6 +341,7 @@ export function EditTrainingMode({
           <Button
             onClick={handleSave}
             size="sm"
+            disabled={!startTime}
             className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
           >
             Сохранить
@@ -361,6 +363,7 @@ export function EditTrainingMode({
               <Input
                 id="startTime"
                 type="time"
+                required
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 className="border-gray-200 focus:border-blue-300"
