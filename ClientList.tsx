@@ -3,7 +3,7 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Card } from './ui/card'
 import { Plus, Trash2, User, Settings } from 'lucide-react'
-import type { Client } from '../App'
+import type { Client } from './App'
 
 interface ClientListProps {
   clients: Client[]

@@ -3,7 +3,7 @@ import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { Calendar } from './ui/calendar'
 import { ArrowLeft, Edit3, Play, Dumbbell, TrendingUp } from 'lucide-react'
-import type { Client } from '../App'
+import type { Client } from './App'
 
 interface TrainingProgramProps {
   client: Client

@@ -7,7 +7,7 @@ import { Separator } from './ui/separator'
 import { ArrowLeft, Plus, X, GripVertical, Clock } from 'lucide-react'
 import { DndProvider, useDrag, useDrop } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import type { Client, Exercise, ExerciseCategory } from '../App'
+import type { Client, Exercise, ExerciseCategory } from './App'
 
 interface EditTrainingModeProps {
   client: Client
