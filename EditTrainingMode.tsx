@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { Input } from './ui/input'
@@ -34,7 +34,7 @@ interface DragItem {
   index?: number
 }
 
-function ExerciseItem({ 
+function ExerciseItem({
   exercise, 
   fromProgram = false, 
   onRemove,
@@ -62,9 +62,12 @@ function ExerciseItem({
     }),
   }), [exercise, fromProgram, index])
 
+  const ref = useRef<HTMLDivElement>(null)
+  drag(ref)
+
   return (
     <div
-      ref={(el) => drag(el)}
+      ref={ref}
       className={`p-3 bg-white rounded-lg shadow-sm border cursor-move transition-all duration-200 ${
         isDragging ? 'opacity-50 rotate-2' : 'hover:shadow-md hover:-translate-y-0.5'
       } ${fromProgram ? 'border-l-4 border-l-blue-400' : 'border-gray-200'}`}
@@ -136,9 +139,12 @@ function DropZone({
     }
   }
 
+  const dropRef = useRef<HTMLDivElement>(null)
+  drop(dropRef)
+
   return (
     <div
-      ref={drop}
+      ref={dropRef}
       className={`min-h-32 p-4 border-2 border-dashed rounded-lg transition-colors duration-200 ${
         isOver 
           ? 'border-blue-400 bg-blue-50' 
@@ -202,8 +208,11 @@ function SortableExerciseItem({
     },
   }), [index, moveExercise])
 
+  const ref = useRef<HTMLDivElement>(null)
+  drag(drop(ref))
+
   return (
-    <div ref={(node) => drag(drop(node))}>
+    <div ref={ref}>
       <ExerciseItem
         exercise={exercise}
         fromProgram={true}

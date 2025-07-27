@@ -1,4 +1,4 @@
-import { useAuthToken } from '../pages/index'
+import { useAuthToken } from './auth-context'
 
 export function useApiFetch() {
   const token = useAuthToken()

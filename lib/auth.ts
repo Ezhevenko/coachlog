@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import jwt from 'jsonwebtoken';
 import { users, tokens } from './data';
 
-const SECRET = 'secret';
+const SECRET = process.env.JWT_SECRET || 'changeme';
 
 export function signToken(userId: string) {
   return jwt.sign({ sub: userId }, SECRET, { expiresIn: '1d' });

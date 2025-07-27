@@ -9,7 +9,7 @@ interface RoleSwitcherProps {
 
 export function RoleSwitcher({ role, onChange }: RoleSwitcherProps) {
   return (
-    <Tabs value={role} onValueChange={(val) => onChange(val as Role)} className="mb-4">
+    <Tabs value={role} onValueChange={(val: string) => onChange(val as Role)} className="mb-4">
       <TabsList>
         <TabsTrigger value="coach">Тренер</TabsTrigger>
         <TabsTrigger value="client">Клиент</TabsTrigger>
