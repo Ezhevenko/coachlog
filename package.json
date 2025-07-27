@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node test/imports.test.js"
+    "test": "node test/imports.test.js",
+    "postinstall": "node scripts/create-aliases.js"
   },
   "keywords": [],
   "author": "",

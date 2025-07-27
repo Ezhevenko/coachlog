@@ -4,7 +4,7 @@ A simple Next.js app for tracking workout programs.
 
 ## Setup
 
-1. Install dependencies:
+1. Install dependencies (this runs a postinstall script to create module aliases):
    ```bash
    npm install
    ```
