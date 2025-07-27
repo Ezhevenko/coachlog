@@ -13,6 +13,7 @@ import type { Client, Exercise, ExerciseCategory } from './App'
 interface EditTrainingModeProps {
   client: Client
   day: string
+  date: string
   allExercises: Omit<Exercise, 'currentWeight' | 'history'>[]
   onBack: () => void
 }
@@ -226,22 +227,12 @@ function SortableExerciseItem({
 export function EditTrainingMode({
   client,
   day,
+  date,
   allExercises,
   onBack
 }: EditTrainingModeProps) {
   const apiFetch = useApiFetch()
-  const stubDate = (() => {
-    const map: Record<string, string> = {
-      'Понедельник': '2024-01-01',
-      'Вторник': '2024-01-02',
-      'Среда': '2024-01-03',
-      'Четверг': '2024-01-04',
-      'Пятница': '2024-01-05',
-      'Суббота': '2024-01-06',
-      'Воскресенье': '2024-01-07'
-    }
-    return map[day] || '2024-01-01'
-  })()
+
   const [workoutId, setWorkoutId] = useState<string | null>(null)
   const [programExercises, setProgramExercises] = useState<Exercise[]>([])
   const [startTime, setStartTime] = useState<string>('')
@@ -249,7 +240,7 @@ export function EditTrainingMode({
 
   useEffect(() => {
     const load = async () => {
-      const res = await apiFetch('/api/coach/calendar?date=' + stubDate)
+      const res = await apiFetch('/api/coach/calendar?date=' + date)
       if (!res.ok) return
       const data = await res.json()
       const w = data.find((d: any) => d.clientId === client.id)
@@ -264,7 +255,7 @@ export function EditTrainingMode({
       }
     }
     load()
-  }, [client.id, stubDate])
+  }, [client.id, date])
 
   const exercisesByCategory = allExercises.reduce((acc, exercise) => {
     if (!acc[exercise.category]) {
@@ -301,7 +292,7 @@ export function EditTrainingMode({
     const durationNum = duration ? parseInt(duration) : 60
     const payload = {
       clientId: client.id,
-      date: stubDate,
+      date: date,
       time_start: startTime,
       duration_minutes: durationNum,
       exerciseIds: programExercises.map(e => e.id)

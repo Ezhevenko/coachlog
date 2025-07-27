@@ -9,8 +9,8 @@ import type { Client } from './App'
 interface TrainingProgramProps {
   client: Client
   onBack: () => void
-  onOpenTraining: (day: string) => void
-  onOpenEdit: (day: string) => void
+  onOpenTraining: (day: string, date: string) => void
+  onOpenEdit: (day: string, date: string) => void
   allowEdit?: boolean
 }
 
@@ -53,6 +53,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
   const selectedDayName = WEEKDAYS[selectedDate.getDay()]
   const selectedDayProgram = program[selectedDayName]
   const exerciseCount = selectedDayProgram?.exercises.length || 0
+  const selectedDateString = selectedDate.toISOString().slice(0, 10)
 
   // Функция для определения, есть ли тренировки в конкретный день
   const hasTrainingOnDate = (date: Date) => {
@@ -152,7 +153,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
           {exerciseCount > 0 ? (
             <>
               <Button
-                onClick={() => onOpenTraining(selectedDayName)}
+                onClick={() => onOpenTraining(selectedDayName, selectedDateString)}
                 className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
                 size="lg"
               >
@@ -161,7 +162,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
               </Button>
               {allowEdit && (
                 <Button
-                  onClick={() => onOpenEdit(selectedDayName)}
+                  onClick={() => onOpenEdit(selectedDayName, selectedDateString)}
                   variant="outline"
                   className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
                   size="lg"
@@ -174,7 +175,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
           ) : (
             allowEdit ? (
               <Button
-                onClick={() => onOpenEdit(selectedDayName)}
+                onClick={() => onOpenEdit(selectedDayName, selectedDateString)}
                 className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
                 size="lg"
               >
