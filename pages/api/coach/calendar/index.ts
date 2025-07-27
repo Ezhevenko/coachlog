@@ -1,12 +1,34 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { authMiddleware } from '../../../../lib/auth';
-import { workouts } from '../../../../lib/data';
+import { supabase } from '../../../../lib/supabase';
 import crypto from 'crypto';
 
-function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
+async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
   if (req.method === 'GET') {
     const { date } = req.query;
-    const list = Object.values(workouts).filter(w => !date || w.date === date);
+    const qb = supabase.from('workouts').select('*');
+    if (typeof date === 'string') qb.eq('date', date);
+    const { data: rows, error } = await qb;
+    if (error) {
+      res.status(500).json({ error: error.message });
+      return;
+    }
+    const workoutIds = rows?.map(w => w.id) || [];
+    const { data: ex } = await supabase
+      .from('workout_exercises')
+      .select('workout_id,exercise_id')
+      .in('workout_id', workoutIds);
+    const map: Record<string, string[]> = {};
+    ex?.forEach(e => { (map[e.workout_id] ||= []).push(e.exercise_id); });
+    const list = rows.map(w => ({
+      id: w.id,
+      clientId: w.client_id,
+      date: w.date,
+      time_start: w.time_start,
+      duration_minutes: w.duration_minutes,
+      rounds: w.rounds,
+      exerciseIds: map[w.id] || []
+    }));
     res.status(200).json(list);
   } else if (req.method === 'POST') {
     const { clientId, date, time_start, duration_minutes, rounds, exerciseIds } = req.body || {};
@@ -15,8 +37,17 @@ function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
       return;
     }
     const id = crypto.randomUUID();
-    workouts[id] = { id, clientId, date, time_start, duration_minutes: Number(duration_minutes), rounds, exerciseIds };
-    res.status(201).json(workouts[id]);
+    const { error: insertErr } = await supabase
+      .from('workouts')
+      .insert({ id, client_id: clientId, date, time_start, duration_minutes: Number(duration_minutes), rounds });
+    if (insertErr) {
+      res.status(500).json({ error: insertErr.message });
+      return;
+    }
+    for (let i = 0; i < exerciseIds.length; i++) {
+      await supabase.from('workout_exercises').insert({ workout_id: id, exercise_id: exerciseIds[i], order_index: i });
+    }
+    res.status(201).json({ id, clientId, date, time_start, duration_minutes: Number(duration_minutes), rounds, exerciseIds });
   } else {
     res.status(405).end();
   }

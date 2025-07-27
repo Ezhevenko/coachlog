@@ -1,17 +1,30 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { authMiddleware } from '../../../../lib/auth';
-import { progress, workouts } from '../../../../lib/data';
+import { supabase } from '../../../../lib/supabase';
 
-function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
+async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
   if (req.method !== 'GET') {
     res.status(405).end();
     return;
   }
-  const userProgress = progress.filter(p => {
-    const w = workouts[p.workoutId];
-    return w && w.clientId === req.user.id;
-  });
-  res.status(200).json(userProgress);
+  const { data: workoutsData } = await supabase
+    .from('workouts')
+    .select('id')
+    .eq('client_id', req.user.id);
+  const workoutIds = workoutsData?.map(w => w.id) || [];
+  if (workoutIds.length === 0) {
+    res.status(200).json([]);
+    return;
+  }
+  const { data: progressRows, error } = await supabase
+    .from('exercise_progress')
+    .select('workout_id,exercise_id,round,weight,reps')
+    .in('workout_id', workoutIds);
+  if (error) {
+    res.status(500).json({ error: error.message });
+    return;
+  }
+  res.status(200).json(progressRows || []);
 }
 
 export default authMiddleware(handler);

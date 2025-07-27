@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { authMiddleware } from '../../../../lib/auth';
-import { workouts } from '../../../../lib/data';
+import { supabase } from '../../../../lib/supabase';
 
-function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
+async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
   const { id } = req.query;
   if (typeof id !== 'string') {
     res.status(400).end();
@@ -10,15 +10,21 @@ function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
   }
   if (req.method === 'PATCH') {
     const { clientId, date, time_start, duration_minutes, rounds, exerciseIds } = req.body || {};
-    const existing = workouts[id];
-    if (!existing) {
-      res.status(404).end();
+    const { error } = await supabase
+      .from('workouts')
+      .update({ client_id: clientId, date, time_start, duration_minutes, rounds })
+      .eq('id', id);
+    if (error) {
+      res.status(500).json({ error: error.message });
       return;
     }
-    workouts[id] = { ...existing, clientId, date, time_start, duration_minutes, rounds, exerciseIds };
-    res.status(200).json(workouts[id]);
+    await supabase.from('workout_exercises').delete().eq('workout_id', id);
+    for (let i = 0; i < (exerciseIds || []).length; i++) {
+      await supabase.from('workout_exercises').insert({ workout_id: id, exercise_id: exerciseIds[i], order_index: i });
+    }
+    res.status(200).json({ id, clientId, date, time_start, duration_minutes, rounds, exerciseIds });
   } else if (req.method === 'DELETE') {
-    delete workouts[id];
+    await supabase.from('workouts').delete().eq('id', id);
     res.status(204).end();
   } else {
     res.status(405).end();
