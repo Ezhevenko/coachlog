@@ -12,7 +12,12 @@
     "jsx": "preserve",
     "esModuleInterop": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "lucide-react@0.487.0": ["./node_modules/lucide-react"],
+      "@radix-ui/react-slot@1.1.2": ["./node_modules/@radix-ui/react-slot"],
+      "class-variance-authority@0.7.1": ["./node_modules/class-variance-authority"]
+    }
   },
   "include": ["next-env.d.ts", "pages/**/*.ts", "pages/**/*.tsx", "lib/**/*.ts"],
   "exclude": ["node_modules"]

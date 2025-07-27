@@ -4,7 +4,7 @@ import { Card } from './ui/card'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { Separator } from './ui/separator'
-import { ArrowLeft, Plus, X, GripVertical, Clock } from 'lucide-react'
+import { ArrowLeft, Plus, X, GripVertical, Clock } from 'lucide-react@0.487.0'
 import { DndProvider, useDrag, useDrop } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import type { Client, Exercise, ExerciseCategory } from './App'
@@ -64,7 +64,7 @@ function ExerciseItem({
 
   return (
     <div
-      ref={drag}
+      ref={(el) => drag(el)}
       className={`p-3 bg-white rounded-lg shadow-sm border cursor-move transition-all duration-200 ${
         isDragging ? 'opacity-50 rotate-2' : 'hover:shadow-md hover:-translate-y-0.5'
       } ${fromProgram ? 'border-l-4 border-l-blue-400' : 'border-gray-200'}`}

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { Button } from './ui/button'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react@0.487.0'
 import { TrainingProgram } from './TrainingProgram'
 import { ProgressView } from './ProgressView'
 import type { Client } from './App'
