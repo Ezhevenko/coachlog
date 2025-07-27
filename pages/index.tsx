@@ -1,8 +1,6 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import App from '../App';
-
-export const AuthContext = createContext<string | null>(null);
-export const useAuthToken = () => useContext(AuthContext);
+import { AuthContext } from '../lib/auth-context';
 
 export default function Home() {
   const [token, setToken] = useState<string | null>(null);

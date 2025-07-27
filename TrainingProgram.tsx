@@ -63,10 +63,10 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
         <Calendar
           mode="single"
           selected={selectedDate}
-          onSelect={(date) => date && setSelectedDate(date)}
+          onSelect={(date: Date | undefined) => date && setSelectedDate(date)}
           className="rounded-md"
           modifiers={{
-            hasTraining: (date) => hasTrainingOnDate(date)
+            hasTraining: (date: Date) => hasTrainingOnDate(date)
           }}
           modifiersStyles={{
             hasTraining: {
