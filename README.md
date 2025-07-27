@@ -8,9 +8,11 @@ A simple Next.js app for tracking workout programs.
    ```bash
    npm install
    ```
-2. Copy `.env.example` to `.env` and adjust values. At minimum set:
+2. Copy `.env.example` to `.env` and configure your credentials:
    ```env
    JWT_SECRET=changeme
+   SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=service_role_key
    ```
 
 ## Development
@@ -31,4 +33,4 @@ npx tsc -p tsconfig.json
 
 ## Deployment
 
-Build using `next build` or your hosting provider's build step. Ensure `JWT_SECRET` is configured in the environment.
+Build using `next build` or your hosting provider's build step. Ensure `JWT_SECRET`, `SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY` are configured in the environment.
