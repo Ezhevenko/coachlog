@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { ClientList } from './components/ClientList'
-import { TrainingProgram } from './components/TrainingProgram'
-import { TrainingMode } from './components/TrainingMode'
-import { EditTrainingMode } from './components/EditTrainingMode'
-import { ExerciseSettings } from './components/ExerciseSettings'
+import { ClientList } from './ClientList'
+import { TrainingProgram } from './TrainingProgram'
+import { TrainingMode } from './TrainingMode'
+import { EditTrainingMode } from './EditTrainingMode'
+import { ExerciseSettings } from './ExerciseSettings'
+import { ClientDashboard } from './ClientDashboard'
+import { RoleSwitcher, Role } from './RoleSwitcher'
 
 export interface Exercise {
   id: string
@@ -32,13 +34,14 @@ export interface Client {
   program: DayTraining[]
 }
 
-type View = 'clients' | 'program' | 'training' | 'edit' | 'settings'
+type View = 'clients' | 'program' | 'training' | 'edit' | 'settings' | 'client'
 
 export default function App() {
   const [clients, setClients] = useState<Client[]>([])
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [selectedDay, setSelectedDay] = useState<string>('')
   const [currentView, setCurrentView] = useState<View>('clients')
+  const [activeRole, setActiveRole] = useState<Role>('coach')
 
   // Система управления категориями упражнений
   const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>([
@@ -95,8 +98,19 @@ export default function App() {
   ])
 
   // Получаем плоский список всех упражнений из категорий
-  const allExercises: Omit<Exercise, 'currentWeight' | 'history'>[] = 
+  const allExercises: Omit<Exercise, 'currentWeight' | 'history'>[] =
     exerciseCategories.flatMap(category => category.exercises)
+
+  const handleRoleChange = (role: Role) => {
+    setActiveRole(role)
+    if (role === 'client') {
+      setSelectedClient(clients[0] || null)
+      setCurrentView('client')
+    } else {
+      setCurrentView('clients')
+      setSelectedClient(null)
+    }
+  }
 
   const addClient = (name: string) => {
     const newClient: Client = {
@@ -175,7 +189,9 @@ export default function App() {
   }
 
   const goBack = () => {
-    if (currentView === 'training' || currentView === 'edit') {
+    if (currentView === 'training') {
+      setCurrentView(activeRole === 'coach' ? 'program' : 'client')
+    } else if (currentView === 'edit') {
       setCurrentView('program')
     } else if (currentView === 'program') {
       setCurrentView('clients')
@@ -191,8 +207,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-indigo-50">
-      {currentView === 'clients' && (
-        <ClientList 
+      <div className="p-4">
+        <RoleSwitcher role={activeRole} onChange={handleRoleChange} />
+      </div>
+
+      {activeRole === 'coach' && currentView === 'clients' && (
+        <ClientList
           clients={clients}
           onAddClient={addClient}
           onDeleteClient={deleteClient}
@@ -200,8 +220,8 @@ export default function App() {
           onOpenSettings={openExerciseSettings}
         />
       )}
-      
-      {currentView === 'program' && selectedClient && (
+
+      {activeRole === 'coach' && currentView === 'program' && selectedClient && (
         <TrainingProgram
           client={selectedClient}
           onBack={goBack}
@@ -209,7 +229,15 @@ export default function App() {
           onOpenEdit={openEditMode}
         />
       )}
-      
+
+      {activeRole === 'client' && currentView === 'client' && selectedClient && (
+        <ClientDashboard
+          client={selectedClient}
+          onBack={() => setCurrentView('client')}
+          onOpenTraining={openTrainingMode}
+        />
+      )}
+
       {currentView === 'training' && selectedClient && (
         <TrainingMode
           client={selectedClient}

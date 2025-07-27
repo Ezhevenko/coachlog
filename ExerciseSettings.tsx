@@ -7,7 +7,7 @@ import { Separator } from './ui/separator'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
 import { ArrowLeft, Plus, X, Edit3, Dumbbell, FolderPlus, Trash2 } from 'lucide-react'
-import type { ExerciseCategory } from '../App'
+import type { ExerciseCategory } from './App'
 
 interface ExerciseSettingsProps {
   categories: ExerciseCategory[]

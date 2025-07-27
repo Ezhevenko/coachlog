@@ -1,0 +1,25 @@
+{
+  "name": "coachlog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/imports.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "24.1.0",
+    "@types/react": "19.1.8",
+    "typescript": "5.8.3"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "next": "^15.4.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
+}
