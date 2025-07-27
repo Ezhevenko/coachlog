@@ -64,7 +64,7 @@ function ExerciseItem({
 
   return (
     <div
-      ref={drag}
+      ref={(el) => drag(el)}
       className={`p-3 bg-white rounded-lg shadow-sm border cursor-move transition-all duration-200 ${
         isDragging ? 'opacity-50 rotate-2' : 'hover:shadow-md hover:-translate-y-0.5'
       } ${fromProgram ? 'border-l-4 border-l-blue-400' : 'border-gray-200'}`}
