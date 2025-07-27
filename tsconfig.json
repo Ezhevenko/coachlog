@@ -1,11 +1,19 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "commonjs",
-    "jsx": "react",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["*.ts", "*.tsx", "ui/**/*.ts", "ui/**/*.tsx", "pages/**/*.ts"]
+  "include": ["next-env.d.ts", "pages/**/*.ts", "pages/**/*.tsx", "lib/**/*.ts"],
+  "exclude": ["node_modules"]
 }

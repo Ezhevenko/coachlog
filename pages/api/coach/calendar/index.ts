@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { authMiddleware } from '../../../../../lib/auth';
-import { workouts } from '../../../../../lib/data';
+import { authMiddleware } from '../../../../lib/auth';
+import { workouts } from '../../../../lib/data';
 import crypto from 'crypto';
 
 function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {

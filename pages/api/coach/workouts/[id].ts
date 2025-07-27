@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { authMiddleware } from '../../../../../lib/auth';
-import { workouts } from '../../../../../lib/data';
+import { authMiddleware } from '../../../../lib/auth';
+import { workouts } from '../../../../lib/data';
 
 function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
   const { id } = req.query;

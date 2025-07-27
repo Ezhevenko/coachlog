@@ -11,6 +11,7 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "24.1.0",
     "@types/react": "19.1.8",
     "typescript": "5.8.3"
