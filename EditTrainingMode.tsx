@@ -15,7 +15,7 @@ interface EditTrainingModeProps {
   day: string
   date: string
   workoutId?: string
-  allExercises: Omit<Exercise, 'currentWeight' | 'history'>[]
+  allExercises: Omit<Exercise, 'currentWeight' | 'currentReps' | 'history'>[]
   categories: ExerciseCategory[]
   onBack: () => void
   initialStartTime?: string
@@ -34,7 +34,7 @@ const defaultCategoryNames = {
 
 interface DragItem {
   type: string
-  exercise: Omit<Exercise, 'currentWeight' | 'history'>
+  exercise: Omit<Exercise, 'currentWeight' | 'currentReps' | 'history'>
   fromProgram?: boolean
   index?: number
 }
@@ -46,7 +46,7 @@ function ExerciseItem({
   onClick,
   index
 }: {
-  exercise: Exercise | Omit<Exercise, 'currentWeight' | 'history'>
+  exercise: Exercise | Omit<Exercise, 'currentWeight' | 'currentReps' | 'history'>
   fromProgram?: boolean
   onRemove?: () => void
   onClick?: () => void
@@ -59,6 +59,7 @@ function ExerciseItem({
       exercise: fromProgram ? exercise : {
         ...exercise,
         currentWeight: 0,
+        currentReps: 0,
         history: []
       },
       fromProgram,
@@ -126,11 +127,12 @@ function DropZone({
         return
       }
       
-      const exerciseToAdd: Exercise = 'currentWeight' in item.exercise 
+      const exerciseToAdd: Exercise = 'currentWeight' in item.exercise
         ? item.exercise as Exercise
         : {
             ...item.exercise,
             currentWeight: 0,
+            currentReps: 0,
             history: []
           }
       
@@ -271,8 +273,8 @@ export function EditTrainingMode({
         setProgramExercises(w.exerciseIds.map((id: string) => {
           const ex = allExercises.find(e => e.id === id)
           return ex
-            ? { ...ex, currentWeight: 0, history: [] }
-            : { id, name: id, category: 'other', currentWeight: 0, history: [] }
+            ? { ...ex, currentWeight: 0, currentReps: 0, history: [] }
+            : { id, name: id, category: 'other', currentWeight: 0, currentReps: 0, history: [] }
         }))
       }
     }
@@ -456,6 +458,7 @@ export function EditTrainingMode({
                       handleDrop({
                         ...exercise,
                         currentWeight: 0,
+                        currentReps: 0,
                         history: []
                       })
                     }
