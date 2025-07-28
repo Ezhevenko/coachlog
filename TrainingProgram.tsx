@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useApiFetch } from './lib/api'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
+import { WorkoutCard } from './WorkoutCard'
 import { Calendar } from './ui/calendar'
 import { ArrowLeft, Edit3, Play, Dumbbell, TrendingUp } from 'lucide-react@0.487.0'
 import type { Client } from './App'
@@ -112,6 +113,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
           selected={selectedDate}
           onSelect={(date: Date | undefined) => date && setSelectedDate(date)}
           className="rounded-md"
+          modifiersClassNames={{ hasTraining: 'rdp-day_hasTraining' }}
           modifiers={{
             hasTraining: (date: Date) => hasTrainingOnDate(date)
           }}
@@ -198,6 +200,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
                   </div>
                 </div>
               ))}
+
               {allowEdit && (
                 <Button
                   onClick={() => onOpenEdit(client, selectedDayName, selectedDateString)}

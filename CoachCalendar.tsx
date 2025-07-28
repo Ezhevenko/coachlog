@@ -3,6 +3,7 @@ import { useApiFetch } from './lib/api'
 import { Calendar } from './ui/calendar'
 import { Card } from './ui/card'
 import { Button } from './ui/button'
+import { WorkoutCard } from './WorkoutCard'
 
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from './ui/select'
 import { Input } from './ui/input'
@@ -103,6 +104,7 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
           selected={selectedDate}
           onSelect={date => date && setSelectedDate(date)}
           className="rounded-md"
+          modifiersClassNames={{ hasTraining: 'rdp-day_hasTraining' }}
           classNames={{
             day_selected:
               'bg-blue-500 text-white hover:bg-blue-600 focus:bg-blue-600'
@@ -121,36 +123,17 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
           const client = clientMap[w.clientId]
           if (!client) return null
           return (
-            <Card
+            <WorkoutCard
               key={w.id}
-              className="flex items-center justify-between p-4 bg-white shadow-sm border-0 flex-row"
-            >
-              <div className="flex items-center gap-2">
-                <h3 className="font-medium text-gray-800">{client.name}</h3>
-                {w.time_start && (
-                  <span className="text-sm text-gray-500">
-                    {w.time_start.slice(0, 5)}
-                  </span>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="icon"
-                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
-                  onClick={() => onOpenTraining(client, selectedDayName, selectedDateStr, w.id)}
-                >
-                  <Play className="w-4 h-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                  onClick={() => onOpenEdit(client, selectedDayName, selectedDateStr, w.id)}
-                >
-                  <Edit3 className="w-4 h-4" />
-                </Button>
-              </div>
-            </Card>
+              clientName={client.name}
+              startTime={w.time_start ? w.time_start.slice(0, 5) : undefined}
+              onStart={() =>
+                onOpenTraining(client, selectedDayName, selectedDateStr, w.id)
+              }
+              onEdit={() =>
+                onOpenEdit(client, selectedDayName, selectedDateStr, w.id)
+              }
+            />
           )
         })}
       </div>

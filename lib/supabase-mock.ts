@@ -8,7 +8,8 @@ export function createMockSupabase() {
     exercises: [],
     exercise_categories: [],
     client_packages: [],
-    package_history: []
+    package_history: [],
+    exercise_progress: []
   }
 
   class Query {
