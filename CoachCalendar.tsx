@@ -5,10 +5,6 @@ import { Card } from './ui/card'
 import { Button } from './ui/button'
 import { WorkoutCard } from './WorkoutCard'
 
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from './ui/select'
-import { Input } from './ui/input'
-import { Label } from './ui/label'
-import { Play, Edit3 } from 'lucide-react@0.487.0'
 import type { Client } from './App'
 
 interface CoachCalendarProps {
@@ -48,9 +44,6 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [workoutsByDate, setWorkoutsByDate] = useState<Record<string, Workout[]>>({})
 
-  const [newClientId, setNewClientId] = useState<string>('')
-  const [newStart, setNewStart] = useState('')
-  const [newDuration, setNewDuration] = useState('60')
 
   useEffect(() => {
     const load = async () => {
@@ -82,19 +75,6 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
     return (workoutsByDate[key]?.length || 0) > 0
   }
 
-  const handleCreate = () => {
-    const c = clientMap[newClientId]
-    if (!c || !newStart) return
-    setNewStart('')
-    onOpenEdit(
-      c,
-      WEEKDAYS[selectedDate.getDay()],
-      selectedDateStr,
-      undefined,
-      newStart,
-      newDuration
-    )
-  }
 
   return (
     <div className="max-w-md mx-auto p-4 pt-6 pb-10 min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
@@ -138,40 +118,8 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
         })}
       </div>
 
-      <div className="bg-white shadow-lg p-4 rounded-lg mt-4">
-        <h2 className="font-medium mb-2">Новая тренировка</h2>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Клиент</Label>
-              <Select value={newClientId} onValueChange={setNewClientId}>
-                <SelectTrigger className="border-gray-200 focus:border-blue-300">
-                  <SelectValue placeholder="Выберите клиента" />
-                </SelectTrigger>
-                <SelectContent className="bg-white">
-                  {clients.map(c => (
-                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-          </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="start">Время начала</Label>
-                <Input id="start" type="time" value={newStart} onChange={e => setNewStart(e.target.value)} />
-              </div>
-              <div>
-                <Label htmlFor="dur">Длительность (мин)</Label>
-                <Input id="dur" type="number" value={newDuration} onChange={e => setNewDuration(e.target.value)} />
-              </div>
-            </div>
-            <div className="flex justify-end">
-              <Button onClick={handleCreate} disabled={!newClientId || !newStart}>
-                Далее
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Block for creating a new workout has been removed as workouts are now added from the client page */}
+    </div>
   )
 }
 
