@@ -108,6 +108,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
           selected={selectedDate}
           onSelect={(date: Date | undefined) => date && setSelectedDate(date)}
           className="rounded-md"
+          modifiersClassNames={{ hasTraining: 'rdp-day_hasTraining' }}
           modifiers={{
             hasTraining: (date: Date) => hasTrainingOnDate(date)
           }}
