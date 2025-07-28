@@ -44,6 +44,7 @@ export default function App() {
   const [initialDuration, setInitialDuration] = useState<string | undefined>()
   const [currentWorkoutId, setCurrentWorkoutId] = useState<string | undefined>()
   const [activeRole, setActiveRole] = useState<Role>('coach')
+  const [returnView, setReturnView] = useState<View>('calendar')
   const apiFetch = useApiFetch()
   const token = useAuthToken()
 
@@ -125,6 +126,7 @@ export default function App() {
     setSelectedDay(day)
     setSelectedDate(date)
     setCurrentWorkoutId(workoutId)
+    setReturnView(currentView)
     setCurrentView('training')
   }
 
@@ -142,6 +144,7 @@ export default function App() {
     setCurrentWorkoutId(workoutId)
     setInitialStartTime(start)
     setInitialDuration(duration)
+    setReturnView(currentView)
     setCurrentView('edit')
   }
 
@@ -152,7 +155,7 @@ export default function App() {
   const goBack = () => {
     if (currentView === 'training' || currentView === 'edit') {
       setCurrentWorkoutId(undefined)
-      setCurrentView(activeRole === 'coach' ? 'calendar' : 'client')
+      setCurrentView(returnView)
     } else if (currentView === 'program') {
       setCurrentView('clients')
       setSelectedClient(null)
