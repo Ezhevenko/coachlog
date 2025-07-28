@@ -70,6 +70,9 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
   const selectedDateStr = selectedDate.toISOString().slice(0, 10)
   const selectedDayName = WEEKDAYS[selectedDate.getDay()]
   const dayWorkouts = workoutsByDate[selectedDateStr] || []
+  const sortedWorkouts = [...dayWorkouts].sort((a, b) =>
+    (a.time_start || '').localeCompare(b.time_start || '')
+  )
 
   const clientMap = Object.fromEntries(clients.map(c => [c.id, c])) as Record<string, Client>
 
@@ -100,6 +103,10 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
           selected={selectedDate}
           onSelect={date => date && setSelectedDate(date)}
           className="rounded-md"
+          classNames={{
+            day_selected:
+              'bg-blue-500 text-white hover:bg-blue-600 focus:bg-blue-600'
+          }}
           modifiers={{
             hasTraining: (date: Date) => hasTrainingOnDate(date)
           }}
@@ -114,10 +121,10 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
       </Card>
 
       <div className="space-y-3 mb-20">
-        {dayWorkouts.length === 0 && (
+        {sortedWorkouts.length === 0 && (
           <p className="text-center text-gray-500">Нет тренировок</p>
         )}
-        {dayWorkouts.map(w => {
+        {sortedWorkouts.map(w => {
           const client = clientMap[w.clientId]
           if (!client) return null
           return (
@@ -125,10 +132,12 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
               key={w.id}
               className="p-4 flex items-center justify-between bg-white shadow-sm border-0"
             >
-              <div>
+              <div className="flex items-center gap-2">
                 <h3 className="font-medium text-gray-800">{client.name}</h3>
                 {w.time_start && (
-                  <p className="text-sm text-gray-500">{w.time_start}</p>
+                  <span className="text-sm text-gray-500">
+                    {w.time_start.slice(0, 5)}
+                  </span>
                 )}
               </div>
               <div className="flex gap-2">
