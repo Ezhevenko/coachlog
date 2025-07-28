@@ -9,7 +9,8 @@ export function createMockSupabase() {
     exercise_categories: [],
     client_packages: [],
     package_history: [],
-    exercise_progress: []
+    exercise_progress: [],
+    active_roles: []
   }
 
   class Query {
@@ -17,11 +18,13 @@ export function createMockSupabase() {
     filters: ((row: any) => boolean)[] = []
     columns: string | undefined
     singleRow = false
-    action: 'select' | 'insert' | 'update' | 'delete' | null = null
+    action: 'select' | 'insert' | 'update' | 'delete' | 'upsert' | null = null
     data: any
+    options: any
     constructor(table: any[]) { this.table = table }
     select(cols: string) { this.action = 'select'; this.columns = cols; return this }
     insert(data: any) { if (Array.isArray(data)) this.table.push(...data); else this.table.push(data); return Promise.resolve({ error: null, data }) }
+    upsert(data: any, options?: any) { this.action = 'upsert'; this.data = data; this.options = options; return this }
     update(data: any) { this.action = 'update'; this.data = data; return this }
     delete() { this.action = 'delete'; return this }
     eq(col: string, val: any) { this.filters.push(r => r[col] === val); return this }
@@ -33,6 +36,16 @@ export function createMockSupabase() {
       if (this.action === 'update') {
         rows.forEach(r => Object.assign(r, this.data))
         return { error: null }
+      }
+      if (this.action === 'upsert') {
+        const key = this.options?.onConflict || 'id'
+        const items = Array.isArray(this.data) ? this.data : [this.data]
+        for (const item of items) {
+          const existing = this.table.find(r => r[key] === item[key])
+          if (existing) Object.assign(existing, item)
+          else this.table.push(item)
+        }
+        return { error: null, data: this.data }
       }
       if (this.action === 'delete') {
         this.table = this.table.filter(row => !rows.includes(row))
