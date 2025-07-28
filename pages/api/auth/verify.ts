@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { activeRoles } from '../../../lib/data';
 import { signToken } from '../../../lib/auth';
 import { supabase } from '../../../lib/supabase';
 import crypto from 'crypto';
@@ -32,8 +31,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   const { data: rolesData } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
   const roles = rolesData?.map(r => r.role) || ['coach'];
-  activeRoles[user.id] = activeRoles[user.id] || 'coach';
-  const responseUser = { id: user.id, telegram_id: user.telegram_id, full_name: user.full_name, roles, activeRole: activeRoles[user.id] };
+  let { data: active } = await supabase
+    .from('active_roles')
+    .select('active_role')
+    .eq('user_id', user.id)
+    .single();
+  if (!active) {
+    active = { active_role: 'coach' };
+    await supabase.from('active_roles').insert({ user_id: user.id, active_role: 'coach' });
+  }
+  const responseUser = { id: user.id, telegram_id: user.telegram_id, full_name: user.full_name, roles, activeRole: active.active_role };
   const token = signToken(user.id);
   res.status(200).json({ token, user: responseUser });
 }

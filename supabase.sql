@@ -42,6 +42,11 @@ CREATE TABLE public.user_roles (
   CONSTRAINT user_roles_pkey PRIMARY KEY (user_id, role),
   CONSTRAINT user_roles_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
+CREATE TABLE public.active_roles (
+  user_id uuid NOT NULL PRIMARY KEY,
+  active_role text NOT NULL CHECK (active_role = ANY (ARRAY['coach'::text, 'client'::text])),
+  CONSTRAINT active_roles_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
 CREATE TABLE public.users (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   telegram_id text NOT NULL UNIQUE,
