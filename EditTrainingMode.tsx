@@ -16,6 +16,8 @@ interface EditTrainingModeProps {
   date: string
   allExercises: Omit<Exercise, 'currentWeight' | 'history'>[]
   onBack: () => void
+  initialStartTime?: string
+  initialDuration?: string
 }
 
 
@@ -229,14 +231,16 @@ export function EditTrainingMode({
   day,
   date,
   allExercises,
-  onBack
+  onBack,
+  initialStartTime,
+  initialDuration
 }: EditTrainingModeProps) {
   const apiFetch = useApiFetch()
 
   const [workoutId, setWorkoutId] = useState<string | null>(null)
   const [programExercises, setProgramExercises] = useState<Exercise[]>([])
-  const [startTime, setStartTime] = useState<string>('')
-  const [duration, setDuration] = useState<string>('60')
+  const [startTime, setStartTime] = useState<string>(initialStartTime || '')
+  const [duration, setDuration] = useState<string>(initialDuration || '60')
 
   useEffect(() => {
     const load = async () => {

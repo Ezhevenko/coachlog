@@ -7,6 +7,7 @@ import { TrainingMode } from './TrainingMode'
 import { EditTrainingMode } from './EditTrainingMode'
 import { ExerciseSettings } from './ExerciseSettings'
 import { ClientDashboard } from './ClientDashboard'
+import CoachCalendar from './CoachCalendar'
 import { RoleSwitcher, Role } from './RoleSwitcher'
 
 export interface Exercise {
@@ -28,14 +29,16 @@ export interface Client {
   name: string
 }
 
-type View = 'clients' | 'program' | 'training' | 'edit' | 'settings' | 'client'
+type View = 'calendar' | 'clients' | 'program' | 'training' | 'edit' | 'settings' | 'client'
 
 export default function App() {
   const [clients, setClients] = useState<Client[]>([])
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [selectedDay, setSelectedDay] = useState<string>('')
   const [selectedDate, setSelectedDate] = useState<string>('')
-  const [currentView, setCurrentView] = useState<View>('clients')
+  const [currentView, setCurrentView] = useState<View>('calendar')
+  const [initialStartTime, setInitialStartTime] = useState<string | undefined>()
+  const [initialDuration, setInitialDuration] = useState<string | undefined>()
   const [activeRole, setActiveRole] = useState<Role>('coach')
   const apiFetch = useApiFetch()
   const token = useAuthToken()
@@ -115,7 +118,7 @@ export default function App() {
       setSelectedClient(clients[0] || null)
       setCurrentView('client')
     } else {
-      setCurrentView('clients')
+      setCurrentView('calendar')
       setSelectedClient(null)
     }
   }
@@ -145,15 +148,25 @@ export default function App() {
     setCurrentView('program')
   }
 
-  const openTrainingMode = (day: string, date: string) => {
+  const openTrainingMode = (client: Client, day: string, date: string) => {
+    setSelectedClient(client)
     setSelectedDay(day)
     setSelectedDate(date)
     setCurrentView('training')
   }
 
-  const openEditMode = (day: string, date: string) => {
+  const openEditMode = (
+    client: Client,
+    day: string,
+    date: string,
+    start?: string,
+    duration?: string
+  ) => {
+    setSelectedClient(client)
     setSelectedDay(day)
     setSelectedDate(date)
+    setInitialStartTime(start)
+    setInitialDuration(duration)
     setCurrentView('edit')
   }
 
@@ -162,15 +175,13 @@ export default function App() {
   }
 
   const goBack = () => {
-    if (currentView === 'training') {
-      setCurrentView(activeRole === 'coach' ? 'program' : 'client')
-    } else if (currentView === 'edit') {
-      setCurrentView('program')
+    if (currentView === 'training' || currentView === 'edit') {
+      setCurrentView(activeRole === 'coach' ? 'calendar' : 'client')
     } else if (currentView === 'program') {
       setCurrentView('clients')
       setSelectedClient(null)
     } else if (currentView === 'settings') {
-      setCurrentView('clients')
+      setCurrentView('calendar')
     }
   }
 
@@ -183,6 +194,14 @@ export default function App() {
       <div className="p-4">
         <RoleSwitcher role={activeRole} onChange={handleRoleChange} />
       </div>
+
+      {activeRole === 'coach' && currentView === 'calendar' && (
+        <CoachCalendar
+          clients={clients}
+          onOpenTraining={openTrainingMode}
+          onOpenEdit={openEditMode}
+        />
+      )}
 
       {activeRole === 'coach' && currentView === 'clients' && (
         <ClientList
@@ -228,6 +247,8 @@ export default function App() {
           day={selectedDay}
           date={selectedDate}
           allExercises={allExercises}
+          initialStartTime={initialStartTime}
+          initialDuration={initialDuration}
           onBack={goBack}
         />
       )}
