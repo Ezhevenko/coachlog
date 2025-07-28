@@ -7,6 +7,8 @@ export function createMockSupabase() {
     user_roles: [],
     exercises: [],
     exercise_categories: [],
+    client_packages: [],
+    package_history: [],
     exercise_progress: []
   }
 

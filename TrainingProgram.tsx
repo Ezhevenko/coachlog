@@ -6,6 +6,7 @@ import { WorkoutCard } from './WorkoutCard'
 import { Calendar } from './ui/calendar'
 import { ArrowLeft, Edit3, Play, Dumbbell, TrendingUp } from 'lucide-react@0.487.0'
 import type { Client } from './App'
+import { ClientPackage } from './ClientPackage'
 
 interface TrainingProgramProps {
   client: Client
@@ -42,6 +43,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
   const apiFetch = useApiFetch()
   // key is ISO date string (YYYY-MM-DD)
   const [program, setProgram] = useState<Record<string, { id: string; exercises: string[]; startTime?: string; duration?: number }[]>>({})
+  const [packageCount, setPackageCount] = useState(0)
 
   useEffect(() => {
     const load = async () => {
@@ -101,6 +103,8 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
           </div>
         </div>
       </div>
+
+      <ClientPackage client={client} onCountChange={setPackageCount} />
 
       {/* Calendar */}
       <Card className="p-4 mb-6 bg-white shadow-sm border-0">
@@ -164,30 +168,39 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
               <p className="text-center text-gray-500">Нет программы</p>
             )
           ) : (
-              <>
-                {selectedDayProgram.map(w => (
-                  <WorkoutCard
-                    key={w.id}
-                    hideName
-                    startTime={w.startTime}
-                    duration={w.duration ? String(w.duration) : undefined}
-                    exerciseCount={w.exercises.length}
-                    onStart={() =>
-                      onOpenTraining(client, selectedDayName, selectedDateString, w.id)
-                    }
-                    onEdit={
-                      allowEdit
-                        ? () =>
-                            onOpenEdit(
-                              client,
-                              selectedDayName,
-                              selectedDateString,
-                              w.id
-                            )
-                        : undefined
-                    }
-                  />
-                ))}
+            <>
+              {selectedDayProgram.map(w => (
+                <div
+                  key={w.id}
+                  className={`flex items-center justify-between p-3 border rounded ${packageCount < 1 ? 'bg-yellow-100' : ''}`}
+                >
+                  <div className="text-sm text-gray-600">
+                    {w.startTime && <span className="mr-2">{w.startTime}</span>}
+                    {w.duration && <span>{w.duration} мин</span>}
+                    <span className="ml-2">{w.exercises.length} упр.</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="icon"
+                      className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                      onClick={() => onOpenTraining(client, selectedDayName, selectedDateString, w.id)}
+                    >
+                      <Play className="w-4 h-4" />
+                    </Button>
+                    {allowEdit && (
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                        onClick={() => onOpenEdit(client, selectedDayName, selectedDateString, w.id)}
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+
               {allowEdit && (
                 <Button
                   onClick={() => onOpenEdit(client, selectedDayName, selectedDateString)}
