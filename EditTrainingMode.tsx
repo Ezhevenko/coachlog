@@ -246,19 +246,20 @@ export function EditTrainingMode({
 
   useEffect(() => {
     const load = async () => {
+      if (!propWorkoutId) return
       const res = await apiFetch('/api/coach/calendar?date=' + date)
       if (!res.ok) return
       const data = await res.json()
-      const w = data.find((d: any) =>
-        propWorkoutId ? d.id === propWorkoutId : d.clientId === client.id
-      )
+      const w = data.find((d: any) => d.id === propWorkoutId)
       if (w) {
         setWorkoutId(w.id)
         setStartTime(w.time_start || '')
         setDuration(w.duration_minutes ? String(w.duration_minutes) : '')
         setProgramExercises(w.exerciseIds.map((id: string) => {
           const ex = allExercises.find(e => e.id === id)
-          return ex ? { ...ex, currentWeight: 0, history: [] } : { id, name: id, category: 'other', currentWeight: 0, history: [] }
+          return ex
+            ? { ...ex, currentWeight: 0, history: [] }
+            : { id, name: id, category: 'other', currentWeight: 0, history: [] }
         }))
       }
     }
