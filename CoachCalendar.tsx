@@ -110,13 +110,6 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
           modifiers={{
             hasTraining: (date: Date) => hasTrainingOnDate(date)
           }}
-          modifiersStyles={{
-            hasTraining: {
-              backgroundColor: 'rgba(34, 197, 94, 0.1)',
-              color: 'rgb(34, 197, 94)',
-              fontWeight: 'bold'
-            }
-          }}
         />
       </Card>
 
