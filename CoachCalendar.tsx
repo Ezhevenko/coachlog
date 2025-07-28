@@ -104,6 +104,7 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
           selected={selectedDate}
           onSelect={date => date && setSelectedDate(date)}
           className="rounded-md"
+          modifiersClassNames={{ hasTraining: 'rdp-day_hasTraining' }}
           classNames={{
             day_selected:
               'bg-blue-500 text-white hover:bg-blue-600 focus:bg-blue-600'
