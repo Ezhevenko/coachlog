@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useApiFetch } from './lib/api'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
@@ -26,11 +26,6 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
   const [newWeight, setNewWeight] = useState('')
   const [newReps, setNewReps] = useState('')
   const [newRound, setNewRound] = useState('')
-  const [isDragging, setIsDragging] = useState(false)
-  const [startX, setStartX] = useState(0)
-  const [translateX, setTranslateX] = useState(0)
-
-  const cardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -99,66 +94,6 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
 
   const currentExercise = exercises[currentExerciseIndex]
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true)
-    setStartX(e.touches[0].clientX)
-  }
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return
-    const currentX = e.touches[0].clientX
-    const diff = currentX - startX
-    setTranslateX(diff)
-  }
-
-  const handleTouchEnd = () => {
-    if (!isDragging) return
-    
-    const threshold = 100
-    if (Math.abs(translateX) > threshold) {
-      if (translateX > 0) {
-        // Свайп вправо - предыдущее упражнение
-        goToPrevious()
-      } else {
-        // Свайп влево - следующее упражнение
-        goToNext()
-      }
-    }
-    
-    setIsDragging(false)
-    setTranslateX(0)
-  }
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true)
-    setStartX(e.clientX)
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
-  }
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return
-    const diff = e.clientX - startX
-    setTranslateX(diff)
-  }
-
-  const handleMouseUp = () => {
-    if (!isDragging) return
-    
-    const threshold = 100
-    if (Math.abs(translateX) > threshold) {
-      if (translateX > 0) {
-        goToPrevious()
-      } else {
-        goToNext()
-      }
-    }
-    
-    setIsDragging(false)
-    setTranslateX(0)
-    document.removeEventListener('mousemove', handleMouseMove)
-    document.removeEventListener('mouseup', handleMouseUp)
-  }
 
   const goToNext = () => {
     if (currentExerciseIndex < exercises.length - 1) {
@@ -249,19 +184,8 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
       </div>
 
       {/* Карточка упражнения */}
-      <div className="relative h-96 mb-8">
-        <Card
-          ref={cardRef}
-          className="absolute inset-0 bg-white shadow-xl border-0 p-6 cursor-grab active:cursor-grabbing overflow-hidden"
-          style={{
-            transform: `translateX(${translateX}px) rotate(${translateX * 0.02}deg)`,
-            transition: isDragging ? 'none' : 'all 0.3s ease-out'
-          }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onMouseDown={handleMouseDown}
-        >
+      <div className="mb-8">
+        <Card className="bg-white shadow-xl border-0 p-6">
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <TrendingUp className="w-8 h-8 text-white" />
@@ -360,7 +284,7 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
         
         <div className="text-center">
           <p className="text-sm text-gray-500">
-            Свайпните для переключения
+            Используйте кнопки для переключения
           </p>
         </div>
         
