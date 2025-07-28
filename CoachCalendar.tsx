@@ -179,7 +179,6 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
           </div>
         </div>
       </div>
-    </div>
   )
 }
 
