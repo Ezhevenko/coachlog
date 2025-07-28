@@ -9,8 +9,14 @@ import type { Client } from './App'
 interface TrainingProgramProps {
   client: Client
   onBack: () => void
-  onOpenTraining: (day: string, date: string) => void
-  onOpenEdit: (day: string, date: string) => void
+  onOpenTraining: (client: Client, day: string, date: string) => void
+  onOpenEdit: (
+    client: Client,
+    day: string,
+    date: string,
+    start?: string,
+    duration?: string
+  ) => void
   allowEdit?: boolean
 }
 
@@ -155,7 +161,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
           {exerciseCount > 0 ? (
             <>
               <Button
-                onClick={() => onOpenTraining(selectedDayName, selectedDateString)}
+                onClick={() => onOpenTraining(client, selectedDayName, selectedDateString)}
                 className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
                 size="lg"
               >
@@ -164,7 +170,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
               </Button>
               {allowEdit && (
                 <Button
-                  onClick={() => onOpenEdit(selectedDayName, selectedDateString)}
+                  onClick={() => onOpenEdit(client, selectedDayName, selectedDateString)}
                   variant="outline"
                   className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
                   size="lg"
@@ -177,7 +183,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
           ) : (
             allowEdit ? (
               <Button
-                onClick={() => onOpenEdit(selectedDayName, selectedDateString)}
+                onClick={() => onOpenEdit(client, selectedDayName, selectedDateString)}
                 className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
                 size="lg"
               >

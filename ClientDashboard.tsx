@@ -10,7 +10,7 @@ interface ClientDashboardProps {
   client: Client
   allExercises: Omit<Exercise, 'currentWeight' | 'history'>[]
   onBack: () => void
-  onOpenTraining: (day: string, date: string) => void
+  onOpenTraining: (client: Client, day: string, date: string) => void
 }
 
 export function ClientDashboard({ client, allExercises, onBack, onOpenTraining }: ClientDashboardProps) {
