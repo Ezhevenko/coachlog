@@ -162,7 +162,7 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
                 <SelectTrigger className="border-gray-200 focus:border-blue-300">
                   <SelectValue placeholder="Выберите клиента" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   {clients.map(c => (
                     <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                   ))}
