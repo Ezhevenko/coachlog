@@ -91,12 +91,15 @@ export default function App() {
     const res = await apiFetch('/api/coach/clients', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ telegram_id: Date.now().toString(), full_name: name })
+      body: JSON.stringify({ full_name: name })
     })
     if (!res.ok) return
     const data = await res.json()
     const newClient: Client = { id: data.id, name: data.full_name }
     setClients(prev => [...prev, newClient])
+    if (data.inviteToken) {
+      window.prompt('Invite link', `${window.location.origin}/invite/${data.inviteToken}`)
+    }
   }
 
   const deleteClient = async (clientId: string) => {

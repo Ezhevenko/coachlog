@@ -25,14 +25,15 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
     res.status(200).json(rows || []);
   } else if (req.method === 'POST') {
     const { telegram_id, full_name } = req.body || {};
-    if (!telegram_id || !full_name) {
+    if (!full_name) {
       res.status(400).json({ error: 'invalid data' });
       return;
     }
     const id = crypto.randomUUID();
+    const pendingTelegram = telegram_id || `pending:${crypto.randomUUID()}`;
     const { data: created, error } = await supabase
       .from('users')
-      .insert({ id, telegram_id, full_name })
+      .insert({ id, telegram_id: pendingTelegram, full_name })
       .select('id, telegram_id, full_name')
       .single();
     if (error || !created) {
@@ -41,7 +42,12 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
     }
     await supabase.from('user_roles').insert({ user_id: id, role: 'client' });
     await supabase.from('client_links').insert({ client_id: id, coach_id: req.user.id });
-    res.status(200).json(created);
+    let inviteToken: string | null = null;
+    if (!telegram_id) {
+      inviteToken = crypto.randomUUID();
+      await supabase.from('client_invites').insert({ token: inviteToken, client_id: id, coach_id: req.user.id });
+    }
+    res.status(200).json({ ...created, inviteToken });
   } else {
     res.status(405).end();
   }

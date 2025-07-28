@@ -10,7 +10,8 @@ export function createMockSupabase() {
     client_packages: [],
     package_history: [],
     exercise_progress: [],
-    active_roles: []
+    active_roles: [],
+    client_invites: []
   }
 
   class Query {
