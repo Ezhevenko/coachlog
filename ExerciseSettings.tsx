@@ -3,6 +3,7 @@ import { useApiFetch } from './lib/api'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { Input } from './ui/input'
+import { Textarea } from './ui/textarea'
 import { Label } from './ui/label'
 import { Separator } from './ui/separator'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion'
@@ -83,21 +84,36 @@ export function ExerciseSettings({ categories, onUpdateCategories, onBack }: Exe
   }
 
   const handleAddExercise = async (categoryId: string) => {
-    if (!newExerciseName.trim()) return
-    const res = await apiFetch('/api/coach/exercises', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ categoryId, name: newExerciseName })
-    })
-    if (!res.ok) return
-    const newExercise = await res.json()
-    const updated = list.map(cat =>
-      cat.id === categoryId
-        ? { ...cat, exercises: [...cat.exercises, newExercise] }
-        : cat
-    )
-    setList(updated)
-    onUpdateCategories(updated)
+    const names = newExerciseName
+      .split('\n')
+      .map((n) => n.trim())
+      .filter(Boolean)
+    if (names.length === 0) return
+
+    const added: any[] = []
+
+    for (const name of names) {
+      const res = await apiFetch('/api/coach/exercises', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryId, name })
+      })
+      if (res.ok) {
+        const ex = await res.json()
+        added.push(ex)
+      }
+    }
+
+    if (added.length > 0) {
+      const updated = list.map(cat =>
+        cat.id === categoryId
+          ? { ...cat, exercises: [...cat.exercises, ...added] }
+          : cat
+      )
+      setList(updated)
+      onUpdateCategories(updated)
+    }
+
     setNewExerciseName('')
     setShowAddExercise(null)
   }
@@ -298,18 +314,23 @@ export function ExerciseSettings({ categories, onUpdateCategories, onBack }: Exe
                       </Button>
                     ) : (
                       <div className="space-y-2">
-                        <Input
-                          placeholder="Название упражнения"
+                        <Textarea
+                          placeholder="Названия упражнений (каждое с новой строки)"
                           value={newExerciseName}
                           onChange={(e) => setNewExerciseName(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleAddExercise(category.id)}
                           autoFocus
+                          rows={3}
                           className="border-gray-200 focus:border-blue-300"
                         />
                         <div className="flex gap-2">
                           <Button
                             onClick={() => handleAddExercise(category.id)}
-                            disabled={!newExerciseName.trim()}
+                            disabled={
+                              newExerciseName
+                                .split('\n')
+                                .map((n) => n.trim())
+                                .filter(Boolean).length === 0
+                            }
                             size="sm"
                             className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
                           >
