@@ -32,12 +32,11 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
 
   useEffect(() => {
     const load = async () => {
+      if (!propWorkoutId) return
       const res = await apiFetch('/api/coach/calendar?date=' + date)
       if (!res.ok) return
       const data = await res.json()
-      const w = data.find((d: any) =>
-        propWorkoutId ? d.id === propWorkoutId : d.clientId === client.id
-      )
+      const w = data.find((d: any) => d.id === propWorkoutId)
       if (w) {
         setWorkoutId(w.id)
         setStartTime(w.time_start || '')
