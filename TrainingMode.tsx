@@ -11,7 +11,7 @@ interface TrainingModeProps {
   day: string
   date: string
   workoutId?: string
-  allExercises: Omit<Exercise, 'currentWeight' | 'history'>[]
+  allExercises: Omit<Exercise, 'currentWeight' | 'currentReps' | 'history'>[]
   onBack: () => void
 }
 
@@ -24,6 +24,8 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
 
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0)
   const [newWeight, setNewWeight] = useState('')
+  const [newReps, setNewReps] = useState('')
+  const [newRound, setNewRound] = useState('')
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
   const [translateX, setTranslateX] = useState(0)
@@ -41,12 +43,31 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
         setWorkoutId(w.id)
         setStartTime(w.time_start || '')
         setDuration(w.duration_minutes)
+
+        let historyMap: Record<string, { date: string; weight: number; reps?: number; round?: number }[]> = {}
+        const progRes = await apiFetch(`/api/coach/client-progress?clientId=${client.id}`)
+        if (progRes.ok) {
+          const progress = await progRes.json()
+          let workoutMap: Record<string, string> = {}
+          const wRes = await apiFetch('/api/coach/calendar')
+          if (wRes.ok) {
+            const allW = await wRes.json()
+            workoutMap = Object.fromEntries(allW.map((ww: any) => [ww.id, (ww.date || '').slice(0,10)]))
+          }
+          historyMap = progress.reduce((acc: any, p: any) => {
+            const date = workoutMap[p.workout_id] || ''
+            ;(acc[p.exercise_id] ||= []).push({ date, weight: p.weight || 0, reps: p.reps, round: p.round })
+            return acc
+          }, {} as Record<string, { date: string; weight: number; reps?: number; round?: number }[]>)
+        }
+
         setExercises(
           w.exerciseIds.map((id: string) => {
             const ex = allExercises.find(e => e.id === id)
+            const history = historyMap[id] || []
             return ex
-              ? { ...ex, currentWeight: 0, history: [] }
-              : { id, name: id, category: 'other', currentWeight: 0, history: [] }
+              ? { ...ex, currentWeight: 0, currentReps: 0, history }
+              : { id, name: id, category: 'other', currentWeight: 0, currentReps: 0, history }
           })
         )
       }
@@ -143,6 +164,8 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
     if (currentExerciseIndex < exercises.length - 1) {
       setCurrentExerciseIndex(currentExerciseIndex + 1)
       setNewWeight('')
+      setNewReps('')
+      setNewRound('')
     }
   }
 
@@ -150,25 +173,43 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
     if (currentExerciseIndex > 0) {
       setCurrentExerciseIndex(currentExerciseIndex - 1)
       setNewWeight('')
+      setNewReps('')
+      setNewRound('')
     }
   }
 
-  const handleSaveWeight = async () => {
+  const handleSaveProgress = async () => {
+    if (!workoutId) return
     const weight = parseFloat(newWeight)
-    if (weight && weight > 0 && workoutId) {
-      const res = await apiFetch(`/api/coach/workouts/${workoutId}/progress`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ exerciseId: currentExercise.id, round: currentExercise.history.length, weight })
+    const reps = parseInt(newReps)
+    const round = parseInt(newRound)
+    if (isNaN(round)) return
+
+    const res = await apiFetch(`/api/coach/workouts/${workoutId}/progress`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        exerciseId: currentExercise.id,
+        round,
+        weight: isNaN(weight) ? undefined : weight,
+        reps: isNaN(reps) ? undefined : reps
       })
-      if (res.ok) {
-        setExercises(prev => prev.map((ex, i) =>
-          i === currentExerciseIndex
-            ? { ...ex, currentWeight: weight, history: [...ex.history, { date: new Date().toISOString().split('T')[0], weight }] }
-            : ex
-        ))
-        setNewWeight('')
+    })
+    if (res.ok) {
+      const record = {
+        date: new Date().toISOString().split('T')[0],
+        weight: isNaN(weight) ? 0 : weight,
+        reps: isNaN(reps) ? undefined : reps,
+        round
       }
+      setExercises(prev => prev.map((ex, i) =>
+        i === currentExerciseIndex
+          ? { ...ex, currentWeight: weight || ex.currentWeight, currentReps: reps || ex.currentReps, history: [...ex.history, record] }
+          : ex
+      ))
+      setNewWeight('')
+      setNewReps('')
+      setNewRound('')
     }
   }
 
@@ -246,20 +287,34 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
             </div>
 
             <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-700">
-                Новый вес
-              </label>
-              <div className="flex gap-2">
+              <label className="text-sm font-medium text-gray-700">Новый вес</label>
+              <Input
+                type="number"
+                placeholder="0"
+                value={newWeight}
+                onChange={(e) => setNewWeight(e.target.value)}
+                className="w-full border-gray-200 focus:border-purple-300"
+              />
+              <label className="text-sm font-medium text-gray-700">Повторения</label>
+              <Input
+                type="number"
+                placeholder="0"
+                value={newReps}
+                onChange={(e) => setNewReps(e.target.value)}
+                className="w-full border-gray-200 focus:border-purple-300"
+              />
+              <label className="text-sm font-medium text-gray-700">Круг</label>
+              <div className="flex gap-2 items-end">
                 <Input
                   type="number"
                   placeholder="0"
-                  value={newWeight}
-                  onChange={(e) => setNewWeight(e.target.value)}
+                  value={newRound}
+                  onChange={(e) => setNewRound(e.target.value)}
                   className="flex-1 border-gray-200 focus:border-purple-300"
                 />
                 <Button
-                  onClick={handleSaveWeight}
-                  disabled={!newWeight || parseFloat(newWeight) <= 0}
+                  onClick={handleSaveProgress}
+                  disabled={!newWeight || !newReps || !newRound || parseFloat(newWeight) <= 0 || parseInt(newReps) <= 0 || parseInt(newRound) < 0}
                   className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
                 >
                   <Save className="w-4 h-4" />
@@ -277,7 +332,11 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
                   {currentExercise.history.slice(-3).reverse().map((record, index) => (
                     <div key={index} className="flex justify-between text-sm">
                       <span className="text-gray-500">{record.date}</span>
-                      <span className="font-medium">{record.weight} кг</span>
+                      <span className="font-medium">
+                        {record.weight} кг
+                        {record.reps ? ` × ${record.reps}` : ''}
+                        {record.round !== undefined ? ` (круг ${record.round})` : ''}
+                      </span>
                     </div>
                   ))}
                 </div>

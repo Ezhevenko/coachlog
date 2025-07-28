@@ -8,7 +8,7 @@ import type { Client, Exercise } from './App'
 
 interface ClientDashboardProps {
   client: Client
-  allExercises: Omit<Exercise, 'currentWeight' | 'history'>[]
+  allExercises: Omit<Exercise, 'currentWeight' | 'currentReps' | 'history'>[]
   onBack: () => void
   onOpenTraining: (
     client: Client,

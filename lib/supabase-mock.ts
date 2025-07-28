@@ -6,7 +6,8 @@ export function createMockSupabase() {
     client_links: [],
     user_roles: [],
     exercises: [],
-    exercise_categories: []
+    exercise_categories: [],
+    exercise_progress: []
   }
 
   class Query {

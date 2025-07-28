@@ -17,13 +17,14 @@ export interface Exercise {
   name: string
   category: string
   currentWeight: number
-  history: { date: string; weight: number }[]
+  currentReps: number
+  history: { date: string; weight: number; reps?: number; round?: number }[]
 }
 
 export interface ExerciseCategory {
   id: string
   name: string
-  exercises: Omit<Exercise, 'currentWeight' | 'history'>[]
+  exercises: Omit<Exercise, 'currentWeight' | 'currentReps' | 'history'>[]
 }
 
 export interface Client {
@@ -72,7 +73,7 @@ export default function App() {
   }, [token])
 
   // Получаем плоский список всех упражнений из категорий
-  const allExercises: Omit<Exercise, 'currentWeight' | 'history'>[] =
+  const allExercises: Omit<Exercise, 'currentWeight' | 'currentReps' | 'history'>[] =
     exerciseCategories.flatMap(category => category.exercises)
 
   const handleRoleChange = (role: Role) => {
