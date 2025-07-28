@@ -344,7 +344,9 @@ export function EditTrainingMode({
           </Button>
           <div className="text-center">
             <h1 className="font-bold text-gray-800">Редактирование</h1>
-            <p className="text-sm text-gray-500">{day}</p>
+            <p className="text-sm text-gray-500">
+              {day}, {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
+            </p>
           </div>
           <div className="flex gap-2">
             {workoutId && (
