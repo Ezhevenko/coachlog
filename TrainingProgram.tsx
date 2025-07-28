@@ -111,13 +111,6 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
           modifiers={{
             hasTraining: (date: Date) => hasTrainingOnDate(date)
           }}
-          modifiersStyles={{
-            hasTraining: {
-              backgroundColor: 'rgba(34, 197, 94, 0.1)',
-              color: 'rgb(34, 197, 94)',
-              fontWeight: 'bold'
-            }
-          }}
         />
         <div className="flex items-center gap-4 mt-4 text-xs text-gray-500">
           <div className="flex items-center gap-1">
