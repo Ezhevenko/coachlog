@@ -9,6 +9,8 @@ import { ExerciseSettings } from './ExerciseSettings'
 import { ClientDashboard } from './ClientDashboard'
 import CoachCalendar from './CoachCalendar'
 import { RoleSwitcher, Role } from './RoleSwitcher'
+import { Tabs, TabsList, TabsTrigger } from './ui/tabs'
+import { Calendar as CalendarIcon, Users, Settings } from 'lucide-react@0.487.0'
 
 export interface Exercise {
   id: string
@@ -232,6 +234,40 @@ export default function App() {
           onBack={goBack}
         />
       )}
+
+      {activeRole === 'coach' &&
+        ['calendar', 'clients', 'settings'].includes(currentView) && (
+          <div className="fixed bottom-0 left-0 right-0 border-t bg-white shadow">
+            <Tabs
+              value={currentView}
+              onValueChange={(val) => setCurrentView(val as View)}
+            >
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger
+                  value="calendar"
+                  className="flex flex-col items-center gap-1 py-2"
+                >
+                  <CalendarIcon className="w-5 h-5" />
+                  <span className="text-xs">Календарь</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="clients"
+                  className="flex flex-col items-center gap-1 py-2"
+                >
+                  <Users className="w-5 h-5" />
+                  <span className="text-xs">Клиенты</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="settings"
+                  className="flex flex-col items-center gap-1 py-2"
+                >
+                  <Settings className="w-5 h-5" />
+                  <span className="text-xs">Настройки</span>
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        )}
     </div>
   )
 }
