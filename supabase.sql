@@ -18,6 +18,12 @@ CREATE TABLE public.client_packages (
   CONSTRAINT client_packages_client_id_fkey FOREIGN KEY (client_id) REFERENCES public.users(id),
   CONSTRAINT client_packages_coach_id_fkey FOREIGN KEY (coach_id) REFERENCES public.users(id)
 );
+CREATE TABLE public.client_invites (
+  token text NOT NULL PRIMARY KEY,
+  client_id uuid NOT NULL REFERENCES public.users(id),
+  coach_id uuid NOT NULL REFERENCES public.users(id),
+  created_at timestamp without time zone DEFAULT now()
+);
 CREATE TABLE public.exercise_categories (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   coach_id uuid,
