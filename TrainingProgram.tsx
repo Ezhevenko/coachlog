@@ -5,6 +5,7 @@ import { Card } from './ui/card'
 import { Calendar } from './ui/calendar'
 import { ArrowLeft, Edit3, Play, Dumbbell, TrendingUp } from 'lucide-react@0.487.0'
 import type { Client } from './App'
+import { ClientPackage } from './ClientPackage'
 
 interface TrainingProgramProps {
   client: Client
@@ -41,6 +42,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
   const apiFetch = useApiFetch()
   // key is ISO date string (YYYY-MM-DD)
   const [program, setProgram] = useState<Record<string, { id: string; exercises: string[]; startTime?: string; duration?: number }[]>>({})
+  const [packageCount, setPackageCount] = useState(0)
 
   useEffect(() => {
     const load = async () => {
@@ -100,6 +102,8 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
           </div>
         </div>
       </div>
+
+      <ClientPackage client={client} onCountChange={setPackageCount} />
 
       {/* Calendar */}
       <Card className="p-4 mb-6 bg-white shadow-sm border-0">
@@ -164,7 +168,10 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
           ) : (
             <>
               {selectedDayProgram.map(w => (
-                <div key={w.id} className="flex items-center justify-between p-3 border rounded">
+                <div
+                  key={w.id}
+                  className={`flex items-center justify-between p-3 border rounded ${packageCount < 1 ? 'bg-yellow-100' : ''}`}
+                >
                   <div className="text-sm text-gray-600">
                     {w.startTime && <span className="mr-2">{w.startTime}</span>}
                     {w.duration && <span>{w.duration} мин</span>}

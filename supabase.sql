@@ -69,3 +69,25 @@ CREATE TABLE public.workouts (
   CONSTRAINT workouts_pkey PRIMARY KEY (id),
   CONSTRAINT workouts_client_id_fkey FOREIGN KEY (client_id) REFERENCES public.users(id)
 );
+
+CREATE TABLE public.client_packages (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  client_id uuid NOT NULL,
+  coach_id uuid NOT NULL,
+  count integer NOT NULL DEFAULT 0,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT client_packages_pkey PRIMARY KEY (id),
+  CONSTRAINT client_packages_client_id_fkey FOREIGN KEY (client_id) REFERENCES public.users(id),
+  CONSTRAINT client_packages_coach_id_fkey FOREIGN KEY (coach_id) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.package_history (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  client_id uuid NOT NULL,
+  coach_id uuid NOT NULL,
+  delta integer NOT NULL,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT package_history_pkey PRIMARY KEY (id),
+  CONSTRAINT package_history_client_id_fkey FOREIGN KEY (client_id) REFERENCES public.users(id),
+  CONSTRAINT package_history_coach_id_fkey FOREIGN KEY (coach_id) REFERENCES public.users(id)
+);
