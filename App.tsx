@@ -221,6 +221,7 @@ export default function App() {
           date={selectedDate}
           workoutId={currentWorkoutId}
           allExercises={allExercises}
+          categories={exerciseCategories}
           initialStartTime={initialStartTime}
           initialDuration={initialDuration}
           onBack={goBack}

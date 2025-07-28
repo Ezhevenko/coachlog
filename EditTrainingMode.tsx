@@ -16,6 +16,7 @@ interface EditTrainingModeProps {
   date: string
   workoutId?: string
   allExercises: Omit<Exercise, 'currentWeight' | 'history'>[]
+  categories: ExerciseCategory[]
   onBack: () => void
   initialStartTime?: string
   initialDuration?: string
@@ -23,9 +24,9 @@ interface EditTrainingModeProps {
 
 
 
-const categoryNames = {
+const defaultCategoryNames = {
   arms: 'Руки',
-  legs: 'Ноги', 
+  legs: 'Ноги',
   back: 'Спина',
   shoulders: 'Плечи',
   chest: 'Грудь'
@@ -39,14 +40,16 @@ interface DragItem {
 }
 
 function ExerciseItem({
-  exercise, 
-  fromProgram = false, 
+  exercise,
+  fromProgram = false,
   onRemove,
-  index 
-}: { 
+  onClick,
+  index
+}: {
   exercise: Exercise | Omit<Exercise, 'currentWeight' | 'history'>
   fromProgram?: boolean
   onRemove?: () => void
+  onClick?: () => void
   index?: number
 }) {
   const [{ isDragging }, drag] = useDrag(() => ({
@@ -72,9 +75,10 @@ function ExerciseItem({
   return (
     <div
       ref={ref}
+      onClick={!fromProgram ? onClick : undefined}
       className={`p-3 bg-white rounded-lg shadow-sm border cursor-move transition-all duration-200 ${
         isDragging ? 'opacity-50 rotate-2' : 'hover:shadow-md hover:-translate-y-0.5'
-      } ${fromProgram ? 'border-l-4 border-l-blue-400' : 'border-gray-200'}`}
+      } ${fromProgram ? 'border-l-4 border-l-blue-400' : 'border-gray-200'} ${!fromProgram && onClick ? 'cursor-pointer' : ''}`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
@@ -233,6 +237,7 @@ export function EditTrainingMode({
   date,
   workoutId: propWorkoutId,
   allExercises,
+  categories,
   onBack,
   initialStartTime,
   initialDuration
@@ -243,6 +248,14 @@ export function EditTrainingMode({
   const [programExercises, setProgramExercises] = useState<Exercise[]>([])
   const [startTime, setStartTime] = useState<string>(initialStartTime || '')
   const [duration, setDuration] = useState<string>(initialDuration || '60')
+
+  const categoryNameMap = categories.reduce(
+    (acc, c) => {
+      acc[c.id] = c.name
+      return acc
+    },
+    { ...defaultCategoryNames } as Record<string, string>
+  )
 
   useEffect(() => {
     const load = async () => {
@@ -429,14 +442,21 @@ export function EditTrainingMode({
             <div key={category}>
               <h3 className="font-medium text-gray-700 mb-3 flex items-center">
                 <div className="w-3 h-3 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-full mr-2" />
-                {categoryNames[category as keyof typeof categoryNames]}
+                {categoryNameMap[category] || category}
               </h3>
               <div className="space-y-2">
                 {exercises.map((exercise) => (
-                  <ExerciseItem 
+                  <ExerciseItem
                     key={exercise.id}
                     exercise={exercise}
                     fromProgram={false}
+                    onClick={() =>
+                      handleDrop({
+                        ...exercise,
+                        currentWeight: 0,
+                        history: []
+                      })
+                    }
                   />
                 ))}
               </div>
