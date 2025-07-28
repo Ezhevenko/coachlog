@@ -191,9 +191,6 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
       <div className="mb-8">
         <Card className="bg-white shadow-xl border-0 p-6">
           <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <TrendingUp className="w-8 h-8 text-white" />
-            </div>
             <h2 className="text-xl font-bold text-gray-800 mb-2">
               {currentExercise.name}
             </h2>
@@ -216,7 +213,7 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
                 </div>
                 <div className="text-center">
                   {lastRecord && lastRecord.reps !== undefined ? lastRecord.reps : '-'}
-                  <span className="text-base font-medium ml-1">повторений</span>
+                  <span className="text-base font-medium ml-1">повт.</span>
                 </div>
                 <div className="text-center">
                   {lastRecord && lastRecord.round !== undefined ? lastRecord.round : '-'}
