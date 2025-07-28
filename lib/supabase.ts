@@ -1,15 +1,24 @@
 import { createClient } from '@supabase/supabase-js'
 
-const url = process.env.SUPABASE_URL
-const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+let supabase: any
 
-if (!url || !key) {
-  throw new Error(
-    'Supabase environment variables missing. ' +
-    'Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your environment.'
-  )
+if (process.env.MOCK_SUPABASE) {
+  const { createMockSupabase } = require('./supabase-mock')
+  supabase = createMockSupabase()
+} else {
+  const url = process.env.SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!url || !key) {
+    throw new Error(
+      'Supabase environment variables missing. ' +
+      'Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your environment.'
+    )
+  }
+
+  supabase = createClient(url, key, {
+    auth: { persistSession: false }
+  })
 }
 
-export const supabase = createClient(url, key, {
-  auth: { persistSession: false }
-})
+export { supabase }

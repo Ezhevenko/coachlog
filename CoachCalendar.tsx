@@ -3,14 +3,7 @@ import { useApiFetch } from './lib/api'
 import { Calendar } from './ui/calendar'
 import { Card } from './ui/card'
 import { Button } from './ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogTrigger
-} from './ui/dialog'
+
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from './ui/select'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
@@ -154,17 +147,18 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
         })}
       </div>
 
-      <Dialog open={showAdd} onOpenChange={setShowAdd}>
-        <DialogTrigger asChild>
-          <Button className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 shadow-lg">
-            <Plus className="w-6 h-6" />
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Новая тренировка</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 mt-2">
+      {!showAdd && (
+        <Button
+          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 shadow-lg"
+          onClick={() => setShowAdd(true)}
+        >
+          <Plus className="w-6 h-6" />
+        </Button>
+      )}
+      {showAdd && (
+        <div className="bg-white shadow-lg p-4 rounded-lg mt-4">
+          <h2 className="font-medium mb-2">Новая тренировка</h2>
+          <div className="space-y-4">
             <div className="space-y-2">
               <Label>Клиент</Label>
               <Select value={newClientId} onValueChange={setNewClientId}>
@@ -188,14 +182,17 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
                 <Input id="dur" type="number" value={newDuration} onChange={e => setNewDuration(e.target.value)} />
               </div>
             </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowAdd(false)}>
+                Отмена
+              </Button>
+              <Button onClick={handleCreate} disabled={!newClientId || !newStart}>
+                Далее
+              </Button>
+            </div>
           </div>
-          <DialogFooter className="mt-4">
-            <Button onClick={handleCreate} disabled={!newClientId || !newStart}>
-              Далее
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
     </div>
   )
 }

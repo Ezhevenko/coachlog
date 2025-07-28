@@ -12,6 +12,7 @@
     "jsx": "preserve",
     "esModuleInterop": true,
     "strict": true,
+    "noImplicitAny": false,
     "skipLibCheck": true,
     "paths": {
       "lucide-react@0.487.0": ["./node_modules/lucide-react"],

@@ -55,58 +55,18 @@ export default function App() {
   }, [token])
 
   // Система управления категориями упражнений
-  const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>([
-    {
-      id: 'arms',
-      name: 'Руки',
-      exercises: [
-        { id: 'bicep-curl', name: 'Сгибания на бицепс', category: 'arms' },
-        { id: 'tricep-ext', name: 'Разгибания на трицепс', category: 'arms' },
-        { id: 'hammer-curl', name: 'Молотки', category: 'arms' },
-        { id: 'dips', name: 'Отжимания на брусьях', category: 'arms' },
-      ]
-    },
-    {
-      id: 'legs',
-      name: 'Ноги',
-      exercises: [
-        { id: 'squats', name: 'Приседания', category: 'legs' },
-        { id: 'deadlift', name: 'Становая тяга', category: 'legs' },
-        { id: 'leg-press', name: 'Жим ногами', category: 'legs' },
-        { id: 'calf-raises', name: 'Подъемы на носки', category: 'legs' },
-      ]
-    },
-    {
-      id: 'back',
-      name: 'Спина',
-      exercises: [
-        { id: 'pull-ups', name: 'Подтягивания', category: 'back' },
-        { id: 'lat-pulldown', name: 'Тяга верхнего блока', category: 'back' },
-        { id: 'rows', name: 'Тяга штанги к поясу', category: 'back' },
-        { id: 'hyperext', name: 'Гиперэкстензии', category: 'back' },
-      ]
-    },
-    {
-      id: 'shoulders',
-      name: 'Плечи',
-      exercises: [
-        { id: 'shoulder-press', name: 'Жим штанги стоя', category: 'shoulders' },
-        { id: 'lateral-raise', name: 'Махи в стороны', category: 'shoulders' },
-        { id: 'rear-delt', name: 'Обратные махи', category: 'shoulders' },
-        { id: 'front-raise', name: 'Махи перед собой', category: 'shoulders' },
-      ]
-    },
-    {
-      id: 'chest',
-      name: 'Грудь',
-      exercises: [
-        { id: 'bench-press', name: 'Жим лежа', category: 'chest' },
-        { id: 'incline-press', name: 'Жим под углом', category: 'chest' },
-        { id: 'flyes', name: 'Разведения', category: 'chest' },
-        { id: 'pushups', name: 'Отжимания', category: 'chest' },
-      ]
+  const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>([])
+
+  useEffect(() => {
+    const loadCats = async () => {
+      const res = await apiFetch('/api/coach/exercise-categories')
+      if (res.ok) {
+        const data = await res.json()
+        setExerciseCategories(data)
+      }
     }
-  ])
+    if (token) loadCats()
+  }, [token])
 
   // Получаем плоский список всех упражнений из категорий
   const allExercises: Omit<Exercise, 'currentWeight' | 'history'>[] =

@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useApiFetch } from './lib/api'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { Input } from './ui/input'
@@ -16,6 +17,8 @@ interface ExerciseSettingsProps {
 }
 
 export function ExerciseSettings({ categories, onUpdateCategories, onBack }: ExerciseSettingsProps) {
+  const apiFetch = useApiFetch()
+  const [list, setList] = useState<ExerciseCategory[]>(categories)
   const [showAddCategory, setShowAddCategory] = useState(false)
   const [showAddExercise, setShowAddExercise] = useState<string | null>(null)
   const [editingCategory, setEditingCategory] = useState<string | null>(null)
@@ -26,77 +29,111 @@ export function ExerciseSettings({ categories, onUpdateCategories, onBack }: Exe
   const [editCategoryName, setEditCategoryName] = useState('')
   const [editExerciseName, setEditExerciseName] = useState('')
 
-  const handleAddCategory = () => {
-    if (!newCategoryName.trim()) return
-
-    const newCategory: ExerciseCategory = {
-      id: Date.now().toString(),
-      name: newCategoryName,
-      exercises: []
+  useEffect(() => {
+    const load = async () => {
+      const res = await apiFetch('/api/coach/exercise-categories')
+      if (res.ok) {
+        const data = await res.json()
+        setList(data)
+        onUpdateCategories(data)
+      }
     }
+    load()
+  }, [])
 
-    onUpdateCategories([...categories, newCategory])
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return
+    const res = await apiFetch('/api/coach/exercise-categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: newCategoryName })
+    })
+    if (!res.ok) return
+    const newCategory: ExerciseCategory = await res.json()
+    const updated = [...list, newCategory]
+    setList(updated)
+    onUpdateCategories(updated)
     setNewCategoryName('')
     setShowAddCategory(false)
   }
 
-  const handleDeleteCategory = (categoryId: string) => {
-    onUpdateCategories(categories.filter(cat => cat.id !== categoryId))
+  const handleDeleteCategory = async (categoryId: string) => {
+    await apiFetch(`/api/coach/exercise-categories/${categoryId}`, { method: 'DELETE' })
+    const updated = list.filter(cat => cat.id !== categoryId)
+    setList(updated)
+    onUpdateCategories(updated)
   }
 
-  const handleEditCategory = (categoryId: string) => {
+  const handleEditCategory = async (categoryId: string) => {
     if (!editCategoryName.trim()) return
-
-    onUpdateCategories(categories.map(cat => 
-      cat.id === categoryId 
+    await apiFetch(`/api/coach/exercise-categories/${categoryId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: editCategoryName })
+    })
+    const updated = list.map(cat =>
+      cat.id === categoryId
         ? { ...cat, name: editCategoryName }
         : cat
-    ))
+    )
+    setList(updated)
+    onUpdateCategories(updated)
     setEditingCategory(null)
     setEditCategoryName('')
   }
 
-  const handleAddExercise = (categoryId: string) => {
+  const handleAddExercise = async (categoryId: string) => {
     if (!newExerciseName.trim()) return
-
-    const newExercise = {
-      id: Date.now().toString(),
-      name: newExerciseName,
-      category: categoryId
-    }
-
-    onUpdateCategories(categories.map(cat => 
-      cat.id === categoryId 
+    const res = await apiFetch('/api/coach/exercises', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ categoryId, name: newExerciseName })
+    })
+    if (!res.ok) return
+    const newExercise = await res.json()
+    const updated = list.map(cat =>
+      cat.id === categoryId
         ? { ...cat, exercises: [...cat.exercises, newExercise] }
         : cat
-    ))
+    )
+    setList(updated)
+    onUpdateCategories(updated)
     setNewExerciseName('')
     setShowAddExercise(null)
   }
 
-  const handleDeleteExercise = (categoryId: string, exerciseId: string) => {
-    onUpdateCategories(categories.map(cat => 
-      cat.id === categoryId 
+  const handleDeleteExercise = async (categoryId: string, exerciseId: string) => {
+    await apiFetch(`/api/coach/exercises/${exerciseId}`, { method: 'DELETE' })
+    const updated = list.map(cat =>
+      cat.id === categoryId
         ? { ...cat, exercises: cat.exercises.filter(ex => ex.id !== exerciseId) }
         : cat
-    ))
+    )
+    setList(updated)
+    onUpdateCategories(updated)
   }
 
-  const handleEditExercise = () => {
+  const handleEditExercise = async () => {
     if (!editingExercise || !editExerciseName.trim()) return
-
-    onUpdateCategories(categories.map(cat => 
-      cat.id === editingExercise.categoryId 
-        ? { 
-            ...cat, 
-            exercises: cat.exercises.map(ex => 
-              ex.id === editingExercise.exerciseId 
+    await apiFetch(`/api/coach/exercises/${editingExercise.exerciseId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: editExerciseName })
+    })
+    const updated = list.map(cat =>
+      cat.id === editingExercise.categoryId
+        ? {
+            ...cat,
+            exercises: cat.exercises.map(ex =>
+              ex.id === editingExercise.exerciseId
                 ? { ...ex, name: editExerciseName }
                 : ex
             )
           }
         : cat
-    ))
+    )
+    setList(updated)
+    onUpdateCategories(updated)
     setEditingExercise(null)
     setEditExerciseName('')
   }
@@ -182,7 +219,7 @@ export function ExerciseSettings({ categories, onUpdateCategories, onBack }: Exe
 
       {/* Categories List */}
       <div className="space-y-4">
-        {categories.map((category) => (
+        {list.map((category) => (
           <Card key={category.id} className="bg-white shadow-sm border-0 overflow-hidden">
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value={category.id} className="border-0">
@@ -353,7 +390,7 @@ export function ExerciseSettings({ categories, onUpdateCategories, onBack }: Exe
           </Card>
         ))}
 
-        {categories.length === 0 && (
+        {list.length === 0 && (
           <Card className="p-8 bg-gradient-to-br from-blue-50 to-indigo-50 border-0">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4">
