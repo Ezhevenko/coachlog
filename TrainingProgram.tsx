@@ -9,11 +9,17 @@ import type { Client } from './App'
 interface TrainingProgramProps {
   client: Client
   onBack: () => void
-  onOpenTraining: (client: Client, day: string, date: string) => void
+  onOpenTraining: (
+    client: Client,
+    day: string,
+    date: string,
+    workoutId?: string
+  ) => void
   onOpenEdit: (
     client: Client,
     day: string,
     date: string,
+    workoutId?: string,
     start?: string,
     duration?: string
   ) => void
@@ -34,24 +40,26 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const apiFetch = useApiFetch()
   // key is ISO date string (YYYY-MM-DD)
-  const [program, setProgram] = useState<Record<string, { id: string, exercises: string[]; startTime?: string; duration?: number }>>({})
+  const [program, setProgram] = useState<Record<string, { id: string; exercises: string[]; startTime?: string; duration?: number }[]>>({})
 
   useEffect(() => {
     const load = async () => {
       const res = await apiFetch('/api/coach/calendar')
       if (!res.ok) return
       const data = await res.json()
-      const map: Record<string, { id: string; exercises: string[]; startTime?: string; duration?: number }> = {}
-      data.filter((w: any) => w.clientId === client.id).forEach((w: any) => {
-        const dateStr = (w.date || '').slice(0, 10)
-        if (!dateStr) return
-        map[dateStr] = {
-          id: w.id,
-          exercises: w.exerciseIds || [],
-          startTime: w.time_start || undefined,
-          duration: w.duration_minutes || undefined
-        }
-      })
+      const map: Record<string, { id: string; exercises: string[]; startTime?: string; duration?: number }[]> = {}
+      data
+        .filter((w: any) => w.clientId === client.id)
+        .forEach((w: any) => {
+          const dateStr = (w.date || '').slice(0, 10)
+          if (!dateStr) return
+          ;(map[dateStr] ||= []).push({
+            id: w.id,
+            exercises: w.exerciseIds || [],
+            startTime: w.time_start || undefined,
+            duration: w.duration_minutes || undefined
+          })
+        })
       setProgram(map)
     }
     load()
@@ -60,14 +68,17 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
   // Получаем день недели и ключ даты в формате ISO
   const selectedDayName = WEEKDAYS[selectedDate.getDay()]
   const selectedDateString = selectedDate.toISOString().slice(0, 10)
-  const selectedDayProgram = program[selectedDateString]
-  const exerciseCount = selectedDayProgram?.exercises.length || 0
+  const selectedDayProgram = program[selectedDateString] || []
+  const exerciseCount = selectedDayProgram.reduce(
+    (sum, w) => sum + w.exercises.length,
+    0
+  )
 
   // Функция для определения, есть ли тренировки в конкретный день
   const hasTrainingOnDate = (date: Date) => {
     const key = date.toISOString().slice(0, 10)
     const dayProgram = program[key]
-    return (dayProgram?.exercises.length || 0) > 0
+    return (dayProgram?.length || 0) > 0
   }
 
   return (
@@ -134,23 +145,9 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
           {/* Информация о тренировке */}
           {exerciseCount > 0 && (
             <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <div className="flex items-center justify-center gap-4 text-sm text-gray-600">
-                <div className="flex items-center gap-1">
-                  <Dumbbell className="w-4 h-4 text-blue-600" />
-                  <span>{exerciseCount} упражнений</span>
-                </div>
-                {selectedDayProgram?.startTime && (
-                  <div className="flex items-center gap-1">
-                    <span className="text-blue-600">🕐</span>
-                    <span>{selectedDayProgram.startTime}</span>
-                  </div>
-                )}
-                {selectedDayProgram?.duration && (
-                  <div className="flex items-center gap-1">
-                    <span className="text-blue-600">⏱️</span>
-                    <span>{selectedDayProgram.duration} мин</span>
-                  </div>
-                )}
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                <Dumbbell className="w-4 h-4 text-blue-600" />
+                <span>{exerciseCount} упражнений</span>
               </div>
             </div>
           )}
@@ -158,29 +155,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
 
         {/* Action Buttons */}
         <div className="space-y-3">
-          {exerciseCount > 0 ? (
-            <>
-              <Button
-                onClick={() => onOpenTraining(client, selectedDayName, selectedDateString)}
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
-                size="lg"
-              >
-                <Play className="w-5 h-5 mr-2" />
-                Начать тренировку
-              </Button>
-              {allowEdit && (
-                <Button
-                  onClick={() => onOpenEdit(client, selectedDayName, selectedDateString)}
-                  variant="outline"
-                  className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
-                  size="lg"
-                >
-                  <Edit3 className="w-4 h-4 mr-2" />
-                  Редактировать программу
-                </Button>
-              )}
-            </>
-          ) : (
+          {selectedDayProgram.length === 0 ? (
             allowEdit ? (
               <Button
                 onClick={() => onOpenEdit(client, selectedDayName, selectedDateString)}
@@ -193,6 +168,47 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
             ) : (
               <p className="text-center text-gray-500">Нет программы</p>
             )
+          ) : (
+            <>
+              {selectedDayProgram.map(w => (
+                <div key={w.id} className="flex items-center justify-between p-3 border rounded">
+                  <div className="text-sm text-gray-600">
+                    {w.startTime && <span className="mr-2">{w.startTime}</span>}
+                    {w.duration && <span>{w.duration} мин</span>}
+                    <span className="ml-2">{w.exercises.length} упр.</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="icon"
+                      className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                      onClick={() => onOpenTraining(client, selectedDayName, selectedDateString, w.id)}
+                    >
+                      <Play className="w-4 h-4" />
+                    </Button>
+                    {allowEdit && (
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                        onClick={() => onOpenEdit(client, selectedDayName, selectedDateString, w.id)}
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {allowEdit && (
+                <Button
+                  onClick={() => onOpenEdit(client, selectedDayName, selectedDateString)}
+                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
+                  size="lg"
+                >
+                  <Edit3 className="w-4 h-4 mr-2" />
+                  Добавить программу
+                </Button>
+              )}
+            </>
           )}
         </div>
       </Card>
