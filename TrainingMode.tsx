@@ -93,6 +93,10 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
   }
 
   const currentExercise = exercises[currentExerciseIndex]
+  const lastRecord =
+    currentExercise.history.length > 0
+      ? currentExercise.history[currentExercise.history.length - 1]
+      : null
 
 
   const goToNext = () => {
@@ -204,14 +208,25 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
 
           <div className="space-y-4">
             <div className="text-center">
-              <p className="text-gray-600 mb-2">Текущий рабочий вес</p>
-              <div className="text-3xl font-bold text-gray-800">
-                {currentExercise.currentWeight} кг
+              <p className="text-gray-600 mb-2">Последние значения</p>
+              <div className="flex justify-center gap-6 text-3xl font-bold text-gray-800">
+                <div className="text-center">
+                  {lastRecord ? lastRecord.weight : '-'}
+                  <span className="text-base font-medium ml-1">кг</span>
+                </div>
+                <div className="text-center">
+                  {lastRecord && lastRecord.reps !== undefined ? lastRecord.reps : '-'}
+                  <span className="text-base font-medium ml-1">повторений</span>
+                </div>
+                <div className="text-center">
+                  {lastRecord && lastRecord.round !== undefined ? lastRecord.round : '-'}
+                  <span className="text-base font-medium ml-1">кругов</span>
+                </div>
               </div>
             </div>
 
             <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-700">Новый вес</label>
+              <label className="text-sm font-medium text-gray-700">Вес</label>
               <Input
                 type="number"
                 placeholder="0"
@@ -227,7 +242,7 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
                 onChange={(e) => setNewReps(e.target.value)}
                 className="w-full border-gray-200 focus:border-purple-300"
               />
-              <label className="text-sm font-medium text-gray-700">Круг</label>
+              <label className="text-sm font-medium text-gray-700">Кругов</label>
               <div className="flex gap-2 items-end">
                 <Input
                   type="number"
