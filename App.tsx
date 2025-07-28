@@ -39,6 +39,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState<View>('calendar')
   const [initialStartTime, setInitialStartTime] = useState<string | undefined>()
   const [initialDuration, setInitialDuration] = useState<string | undefined>()
+  const [currentWorkoutId, setCurrentWorkoutId] = useState<string | undefined>()
   const [activeRole, setActiveRole] = useState<Role>('coach')
   const apiFetch = useApiFetch()
   const token = useAuthToken()
@@ -108,10 +109,16 @@ export default function App() {
     setCurrentView('program')
   }
 
-  const openTrainingMode = (client: Client, day: string, date: string) => {
+  const openTrainingMode = (
+    client: Client,
+    day: string,
+    date: string,
+    workoutId?: string
+  ) => {
     setSelectedClient(client)
     setSelectedDay(day)
     setSelectedDate(date)
+    setCurrentWorkoutId(workoutId)
     setCurrentView('training')
   }
 
@@ -119,12 +126,14 @@ export default function App() {
     client: Client,
     day: string,
     date: string,
+    workoutId?: string,
     start?: string,
     duration?: string
   ) => {
     setSelectedClient(client)
     setSelectedDay(day)
     setSelectedDate(date)
+    setCurrentWorkoutId(workoutId)
     setInitialStartTime(start)
     setInitialDuration(duration)
     setCurrentView('edit')
@@ -136,6 +145,7 @@ export default function App() {
 
   const goBack = () => {
     if (currentView === 'training' || currentView === 'edit') {
+      setCurrentWorkoutId(undefined)
       setCurrentView(activeRole === 'coach' ? 'calendar' : 'client')
     } else if (currentView === 'program') {
       setCurrentView('clients')
@@ -196,6 +206,7 @@ export default function App() {
           client={selectedClient}
           day={selectedDay}
           date={selectedDate}
+          workoutId={currentWorkoutId}
           allExercises={allExercises}
           onBack={goBack}
         />
@@ -206,6 +217,7 @@ export default function App() {
           client={selectedClient}
           day={selectedDay}
           date={selectedDate}
+          workoutId={currentWorkoutId}
           allExercises={allExercises}
           initialStartTime={initialStartTime}
           initialDuration={initialDuration}

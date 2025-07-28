@@ -10,11 +10,12 @@ interface TrainingModeProps {
   client: Client
   day: string
   date: string
+  workoutId?: string
   allExercises: Omit<Exercise, 'currentWeight' | 'history'>[]
   onBack: () => void
 }
 
-export function TrainingMode({ client, day, date, allExercises, onBack }: TrainingModeProps) {
+export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allExercises, onBack }: TrainingModeProps) {
   const apiFetch = useApiFetch()
   const [workoutId, setWorkoutId] = useState<string | null>(null)
   const [exercises, setExercises] = useState<Exercise[]>([])
@@ -34,7 +35,9 @@ export function TrainingMode({ client, day, date, allExercises, onBack }: Traini
       const res = await apiFetch('/api/coach/calendar?date=' + date)
       if (!res.ok) return
       const data = await res.json()
-      const w = data.find((d: any) => d.clientId === client.id)
+      const w = data.find((d: any) =>
+        propWorkoutId ? d.id === propWorkoutId : d.clientId === client.id
+      )
       if (w) {
         setWorkoutId(w.id)
         setStartTime(w.time_start || '')
@@ -50,7 +53,7 @@ export function TrainingMode({ client, day, date, allExercises, onBack }: Traini
       }
     }
     load()
-  }, [client.id, date])
+  }, [client.id, date, propWorkoutId])
 
   if (exercises.length === 0) {
     return (

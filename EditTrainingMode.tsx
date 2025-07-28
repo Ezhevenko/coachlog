@@ -14,6 +14,7 @@ interface EditTrainingModeProps {
   client: Client
   day: string
   date: string
+  workoutId?: string
   allExercises: Omit<Exercise, 'currentWeight' | 'history'>[]
   onBack: () => void
   initialStartTime?: string
@@ -230,6 +231,7 @@ export function EditTrainingMode({
   client,
   day,
   date,
+  workoutId: propWorkoutId,
   allExercises,
   onBack,
   initialStartTime,
@@ -247,7 +249,9 @@ export function EditTrainingMode({
       const res = await apiFetch('/api/coach/calendar?date=' + date)
       if (!res.ok) return
       const data = await res.json()
-      const w = data.find((d: any) => d.clientId === client.id)
+      const w = data.find((d: any) =>
+        propWorkoutId ? d.id === propWorkoutId : d.clientId === client.id
+      )
       if (w) {
         setWorkoutId(w.id)
         setStartTime(w.time_start || '')
@@ -259,7 +263,7 @@ export function EditTrainingMode({
       }
     }
     load()
-  }, [client.id, date])
+  }, [client.id, date, propWorkoutId])
 
   const exercisesByCategory = allExercises.reduce((acc, exercise) => {
     if (!acc[exercise.category]) {
@@ -322,6 +326,14 @@ export function EditTrainingMode({
     }
   }
 
+  const handleDelete = async () => {
+    if (!workoutId) return
+    const res = await apiFetch(`/api/coach/workouts/${workoutId}`, { method: 'DELETE' })
+    if (res.ok) {
+      onBack()
+    }
+  }
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="max-w-md mx-auto p-4 pt-8 pb-20">
@@ -333,14 +345,26 @@ export function EditTrainingMode({
             <h1 className="font-bold text-gray-800">Редактирование</h1>
             <p className="text-sm text-gray-500">{day}</p>
           </div>
-          <Button
-            onClick={handleSave}
-            size="sm"
-            disabled={!startTime}
-            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
-          >
-            Сохранить
-          </Button>
+          <div className="flex gap-2">
+            {workoutId && (
+              <Button
+                onClick={handleDelete}
+                variant="outline"
+                size="sm"
+                className="border-red-200 text-red-600 hover:bg-red-50"
+              >
+                Удалить
+              </Button>
+            )}
+            <Button
+              onClick={handleSave}
+              size="sm"
+              disabled={!startTime}
+              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+            >
+              Сохранить
+            </Button>
+          </div>
         </div>
 
         {/* Настройки тренировки */}

@@ -12,11 +12,12 @@ import type { Client } from './App'
 
 interface CoachCalendarProps {
   clients: Client[]
-  onOpenTraining: (client: Client, day: string, date: string) => void
+  onOpenTraining: (client: Client, day: string, date: string, workoutId?: string) => void
   onOpenEdit: (
     client: Client,
     day: string,
     date: string,
+    workoutId?: string,
     startTime?: string,
     duration?: string
   ) => void
@@ -81,7 +82,14 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
     const c = clientMap[newClientId]
     if (!c || !newStart) return
     setNewStart('')
-    onOpenEdit(c, WEEKDAYS[selectedDate.getDay()], selectedDateStr, newStart, newDuration)
+    onOpenEdit(
+      c,
+      WEEKDAYS[selectedDate.getDay()],
+      selectedDateStr,
+      undefined,
+      newStart,
+      newDuration
+    )
   }
 
   return (
@@ -127,7 +135,7 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
                 <Button
                   size="icon"
                   className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
-                  onClick={() => onOpenTraining(client, selectedDayName, selectedDateStr)}
+                  onClick={() => onOpenTraining(client, selectedDayName, selectedDateStr, w.id)}
                 >
                   <Play className="w-4 h-4" />
                 </Button>
@@ -135,7 +143,7 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
                   size="icon"
                   variant="outline"
                   className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                  onClick={() => onOpenEdit(client, selectedDayName, selectedDateStr)}
+                  onClick={() => onOpenEdit(client, selectedDayName, selectedDateStr, w.id)}
                 >
                   <Edit3 className="w-4 h-4" />
                 </Button>
