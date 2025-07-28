@@ -130,7 +130,7 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
           return (
             <Card
               key={w.id}
-              className="p-4 flex items-center justify-between bg-white shadow-sm border-0"
+              className="p-4 flex items-center justify-between bg-white shadow-sm border-0 flex-row"
             >
               <div className="flex items-center gap-2">
                 <h3 className="font-medium text-gray-800">{client.name}</h3>
