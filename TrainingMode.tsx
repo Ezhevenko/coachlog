@@ -61,7 +61,9 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
           <Button onClick={onBack} variant="ghost" size="sm" className="p-2">
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="font-bold text-gray-800">{day}</h1>
+          <h1 className="font-bold text-gray-800">
+            {day}, {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
+          </h1>
           <div className="w-10" />
         </div>
         
@@ -177,7 +179,9 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="text-center">
-          <h1 className="font-bold text-gray-800">{day}</h1>
+          <h1 className="font-bold text-gray-800">
+            {day}, {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
+          </h1>
           <p className="text-sm text-gray-500">
             {currentExerciseIndex + 1} из {exercises.length}
             {startTime && ` • ${startTime}`}
