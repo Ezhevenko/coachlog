@@ -11,6 +11,9 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=18 <21"
+  },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "24.1.0",
