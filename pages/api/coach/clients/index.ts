@@ -41,6 +41,17 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
       res.status(400).json({ error: 'invalid data' });
       return;
     }
+    if (telegram_id) {
+      const { data: existing } = await supabase
+        .from('users')
+        .select('id')
+        .eq('telegram_id', telegram_id)
+        .single();
+      if (existing) {
+        res.status(409).json({ error: 'telegram_id already in use' });
+        return;
+      }
+    }
     const id = crypto.randomUUID();
     const pendingTelegram = telegram_id || `pending:${crypto.randomUUID()}`;
     const { data: created, error } = await supabase
