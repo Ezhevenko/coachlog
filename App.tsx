@@ -122,6 +122,12 @@ export default function App() {
     }
   }
 
+  const deleteClientAndReturn = async (clientId: string) => {
+    await deleteClient(clientId)
+    setSelectedClient(null)
+    setCurrentView('clients')
+  }
+
 
   const openClientProgram = (client: Client) => {
     setSelectedClient(client)
@@ -210,6 +216,7 @@ export default function App() {
           onBack={goBack}
           onOpenTraining={openTrainingMode}
           onOpenEdit={openEditMode}
+          onDeleteClient={deleteClientAndReturn}
         />
       )}
 

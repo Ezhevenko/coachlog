@@ -4,7 +4,7 @@ import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { WorkoutCard } from './WorkoutCard'
 import { Calendar } from './ui/calendar'
-import { ArrowLeft, Edit3, Play, Dumbbell, TrendingUp } from 'lucide-react@0.487.0'
+import { ArrowLeft, Edit3, Play, Dumbbell, TrendingUp, Trash2 } from 'lucide-react@0.487.0'
 import type { Client } from './App'
 import { ClientPackage } from './ClientPackage'
 const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
@@ -24,8 +24,9 @@ interface TrainingProgramProps {
     date: string,
     workoutId?: string,
     start?: string,
-    duration?: string
+  duration?: string
   ) => void
+  onDeleteClient?: (clientId: string) => void
   allowEdit?: boolean
 }
 
@@ -39,7 +40,7 @@ const WEEKDAYS = [
   'Суббота'
 ]
 
-export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, allowEdit = true }: TrainingProgramProps) {
+export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, onDeleteClient, allowEdit = true }: TrainingProgramProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const apiFetch = useApiFetch()
   // key is ISO date string (YYYY-MM-DD)
@@ -123,6 +124,16 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
             <p className="text-sm text-blue-600">Программа тренировок</p>
           </div>
         </div>
+        {onDeleteClient && (
+          <Button
+            onClick={() => onDeleteClient(client.id)}
+            variant="destructive"
+            size="icon"
+            className="bg-red-500 hover:bg-red-600"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        )}
       </div>
 
       <ClientPackage client={client} onCountChange={setPackageCount} />
