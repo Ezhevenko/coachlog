@@ -2,6 +2,8 @@
 
 A simple Next.js app for tracking workout programs.
 
+Requires **Node.js 18** or **Node.js 20**.
+
 ## Setup
 
 1. Install dependencies (this runs a postinstall script to create module aliases):
@@ -16,6 +18,7 @@ A simple Next.js app for tracking workout programs.
    NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
    ```
 
+`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` must be provided for production builds.
 `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` should be the bot's username without the `@`.
 
 ## Development
