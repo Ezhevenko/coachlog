@@ -81,7 +81,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
       const data = await res.json()
       if (data.token) {
         const link = botUsername
-          ? `https://t.me/${botUsername}?startapp=/invite/${data.token}`
+          ? `https://t.me/${botUsername}?startapp=invite_${data.token}`
           : `${window.location.origin}/invite/${data.token}`
         setInviteLink(link)
       }

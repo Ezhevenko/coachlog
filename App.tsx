@@ -109,7 +109,7 @@ export default function App() {
     setClients(prev => [...prev, newClient])
     if (data.inviteToken) {
       const link = botUsername
-        ? `https://t.me/${botUsername}?startapp=/invite/${data.inviteToken}`
+        ? `https://t.me/${botUsername}?startapp=invite_${data.inviteToken}`
         : `${window.location.origin}/invite/${data.inviteToken}`
       window.prompt('Invite link', link)
     }
