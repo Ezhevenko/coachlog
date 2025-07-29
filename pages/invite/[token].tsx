@@ -3,6 +3,8 @@ import { useRouter } from 'next/router'
 import { AuthContext } from '../../lib/auth-context'
 import App from '../../App'
 
+const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
+
 export default function InvitePage() {
   const router = useRouter()
   const { token: inviteToken } = router.query
@@ -12,6 +14,13 @@ export default function InvitePage() {
   useEffect(() => {
     if (!inviteToken || typeof inviteToken !== 'string') return
     if (typeof window === 'undefined') return
+
+    if (!(window as any).Telegram?.WebApp) {
+      if (botUsername) {
+        window.location.href = `https://t.me/${botUsername}?startapp=/invite/${inviteToken}`
+      }
+      return
+    }
 
     const existing = window.localStorage.getItem('token')
     if (existing) {
@@ -42,16 +51,7 @@ export default function InvitePage() {
       }
     }
 
-    if ((window as any).Telegram?.WebApp) {
-      handleReady()
-    } else {
-      const script = document.createElement('script')
-      script.src = 'https://telegram.org/js/telegram-web-app.js'
-      script.async = true
-      script.onload = handleReady
-      script.onerror = () => setAuthFailed(true)
-      document.body.appendChild(script)
-    }
+    handleReady()
   }, [inviteToken])
 
   if (token) {
