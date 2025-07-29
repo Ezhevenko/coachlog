@@ -12,6 +12,8 @@ import { RoleSwitcher, Role } from './RoleSwitcher'
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs'
 import { Calendar as CalendarIcon, Users, Settings } from 'lucide-react@0.487.0'
 
+const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
+
 export interface Exercise {
   id: string
   name: string
@@ -99,7 +101,10 @@ export default function App() {
     const newClient: Client = { id: data.id, name: data.full_name }
     setClients(prev => [...prev, newClient])
     if (data.inviteToken) {
-      window.prompt('Invite link', `${window.location.origin}/invite/${data.inviteToken}`)
+      const link = botUsername
+        ? `https://t.me/${botUsername}?startapp=/invite/${data.inviteToken}`
+        : `${window.location.origin}/invite/${data.inviteToken}`
+      window.prompt('Invite link', link)
     }
   }
 

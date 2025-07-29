@@ -13,7 +13,10 @@ A simple Next.js app for tracking workout programs.
    JWT_SECRET=changeme
    SUPABASE_URL=https://your-project.supabase.co
    SUPABASE_SERVICE_ROLE_KEY=service_role_key
+   NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
    ```
+
+`NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` should be the bot's username without the `@`.
 
 ## Development
 

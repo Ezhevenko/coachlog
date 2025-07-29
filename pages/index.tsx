@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import App from '../App';
 import { AuthContext } from '../lib/auth-context';
 
 export default function Home() {
   const [token, setToken] = useState<string | null>(null);
   const [authFailed, setAuthFailed] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -30,6 +32,11 @@ export default function Home() {
     };
 
     const handleReady = () => {
+      const startParam = (window as any).Telegram?.WebApp?.initDataUnsafe?.start_param;
+      if (startParam) {
+        router.replace(startParam as string);
+        return;
+      }
       const initData = (window as any).Telegram?.WebApp?.initData;
       if (initData) {
         verify(initData);
