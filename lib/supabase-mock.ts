@@ -22,6 +22,8 @@ export function createMockSupabase() {
     action: 'select' | 'insert' | 'update' | 'delete' | 'upsert' | null = null
     data: any
     options: any
+    orderColumn: string | null = null
+    orderAsc = true
     constructor(table: any[]) { this.table = table }
     select(cols: string) { this.action = 'select'; this.columns = cols; return this }
     insert(data: any) { if (Array.isArray(data)) this.table.push(...data); else this.table.push(data); return Promise.resolve({ error: null, data }) }
@@ -30,10 +32,20 @@ export function createMockSupabase() {
     delete() { this.action = 'delete'; return this }
     eq(col: string, val: any) { this.filters.push(r => r[col] === val); return this }
     in(col: string, vals: any[]) { this.filters.push(r => vals.includes(r[col])); return this }
+    order(col: string, opts?: { ascending?: boolean }) { this.orderColumn = col; this.orderAsc = opts?.ascending !== false; return this }
     single() { this.singleRow = true; return this }
     async then(resolve: any) { const res = await this.execute(); resolve(res) }
     async execute() {
       let rows = this.table.filter(row => this.filters.every(f => f(row)))
+      if (this.orderColumn) {
+        const c = this.orderColumn
+        const asc = this.orderAsc
+        rows = rows.slice().sort((a,b) => {
+          if (a[c] < b[c]) return asc ? -1 : 1
+          if (a[c] > b[c]) return asc ? 1 : -1
+          return 0
+        })
+      }
       if (this.action === 'update') {
         rows.forEach(r => Object.assign(r, this.data))
         return { error: null }

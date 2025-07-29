@@ -97,6 +97,7 @@ CREATE TABLE public.workouts (
   time_start time without time zone,
   duration_minutes integer,
   rounds integer DEFAULT 1,
+  package_deducted boolean DEFAULT false,
   created_at timestamp without time zone DEFAULT now(),
   CONSTRAINT workouts_pkey PRIMARY KEY (id),
   CONSTRAINT workouts_client_id_fkey FOREIGN KEY (client_id) REFERENCES public.users(id),

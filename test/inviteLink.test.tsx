@@ -15,6 +15,7 @@ async function run() {
   const dom = new JSDOM('<!doctype html><html><body><div id="root"></div></body></html>', { url: 'http://localhost' })
   global.window = dom.window as any
   global.document = dom.window.document as any
+
   Object.defineProperty(global, 'navigator', {
     value: dom.window.navigator,
     configurable: true
