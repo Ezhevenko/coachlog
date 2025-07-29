@@ -7,6 +7,11 @@ export function useApiFetch() {
       ...(init.headers || {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
-    return fetch(input, { ...init, headers })
+    const res = await fetch(input, { ...init, headers })
+    if (res.status === 401 && typeof window !== 'undefined') {
+      try { window.localStorage.removeItem('token') } catch {}
+      try { window.location.reload() } catch {}
+    }
+    return res
   }
 }
