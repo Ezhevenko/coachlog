@@ -53,6 +53,7 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
       client_id: clientId,
       coach_id: req.user.id,
       date,
+      package_deducted: false,
       rounds,
     };
     insertData.time_start = time_start;
