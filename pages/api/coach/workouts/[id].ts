@@ -8,6 +8,19 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
     res.status(400).end();
     return;
   }
+  const { data: workout } = await supabase
+    .from('workouts')
+    .select('coach_id')
+    .eq('id', id)
+    .single();
+  if (!workout) {
+    res.status(404).end();
+    return;
+  }
+  if (workout.coach_id !== req.user.id) {
+    res.status(403).end();
+    return;
+  }
   if (req.method === 'PATCH') {
     const { clientId, date, time_start, duration_minutes, rounds, exerciseIds } = req.body || {};
     if (!time_start) {

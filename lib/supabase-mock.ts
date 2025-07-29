@@ -2,8 +2,8 @@ export function createMockSupabase() {
   const db: Record<string, any[]> = {
     workouts: [],
     workout_exercises: [],
-    users: [{ id: 'user1' }],
-    client_links: [],
+    users: [{ id: 'user1' }, { id: 'user2' }, { id: 'c1' }],
+    client_links: [{ client_id: 'c1', coach_id: 'user1' }],
     user_roles: [],
     exercises: [],
     exercise_categories: [],

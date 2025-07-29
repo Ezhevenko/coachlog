@@ -6,7 +6,7 @@ import crypto from 'crypto';
 async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
   if (req.method === 'GET') {
     const { date } = req.query;
-    const qb = supabase.from('workouts').select('*');
+    const qb = supabase.from('workouts').select('*').eq('coach_id', req.user.id);
     if (typeof date === 'string') qb.eq('date', date);
     const { data: rows, error } = await qb;
     if (error) {
@@ -37,10 +37,21 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
       res.status(400).json({ error: 'invalid data' });
       return;
     }
+    const { data: link } = await supabase
+      .from('client_links')
+      .select('*')
+      .eq('client_id', clientId)
+      .eq('coach_id', req.user.id)
+      .single();
+    if (!link) {
+      res.status(403).json({ error: 'forbidden' });
+      return;
+    }
     const id = crypto.randomUUID();
     const insertData: Record<string, any> = {
       id,
       client_id: clientId,
+      coach_id: req.user.id,
       date,
       rounds,
     };
