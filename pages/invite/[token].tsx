@@ -17,7 +17,7 @@ export default function InvitePage() {
 
     if (!(window as any).Telegram?.WebApp) {
       if (botUsername) {
-        window.location.href = `https://t.me/${botUsername}?startapp=/invite/${inviteToken}`
+        window.location.href = `https://t.me/${botUsername}?startapp=invite_${inviteToken}`
       }
       return
     }

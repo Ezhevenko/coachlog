@@ -33,8 +33,12 @@ export default function Home() {
 
     const handleReady = () => {
       const startParam = (window as any).Telegram?.WebApp?.initDataUnsafe?.start_param;
-      if (startParam) {
-        router.replace(startParam as string);
+      if (typeof startParam === 'string') {
+        if (startParam.startsWith('invite_')) {
+          router.replace(`/invite/${startParam.slice(7)}`);
+          return;
+        }
+        router.replace(startParam);
         return;
       }
       const initData = (window as any).Telegram?.WebApp?.initData;
