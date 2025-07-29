@@ -5,6 +5,10 @@ const tsconfig = require('../tsconfig.json');
 const aliases = tsconfig.compilerOptions && tsconfig.compilerOptions.paths || {};
 
 for (const [name, targets] of Object.entries(aliases)) {
+  if (!Array.isArray(targets) || targets.length === 0) {
+    console.warn(`No target defined for alias ${name}`);
+    continue;
+  }
   const target = targets[0];
   const aliasPath = path.join(__dirname, '..', 'node_modules', name);
   const targetPath = path.join(__dirname, '..', target);
