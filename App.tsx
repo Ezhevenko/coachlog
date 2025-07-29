@@ -32,6 +32,7 @@ export interface ExerciseCategory {
 export interface Client {
   id: string
   name: string
+  telegram_id: string
 }
 
 type View = 'calendar' | 'clients' | 'program' | 'training' | 'edit' | 'settings' | 'client'
@@ -56,7 +57,9 @@ export default function App() {
       const res = await apiFetch('/api/coach/clients')
       if (!res.ok) return
       const data = await res.json()
-      setClients(data.map((c: any) => ({ id: c.id, name: c.full_name })))
+      setClients(
+        data.map((c: any) => ({ id: c.id, name: c.full_name, telegram_id: c.telegram_id }))
+      )
     }
     load()
   }, [token])
@@ -98,7 +101,11 @@ export default function App() {
     })
     if (!res.ok) return
     const data = await res.json()
-    const newClient: Client = { id: data.id, name: data.full_name }
+    const newClient: Client = {
+      id: data.id,
+      name: data.full_name,
+      telegram_id: data.telegram_id
+    }
     setClients(prev => [...prev, newClient])
     if (data.inviteToken) {
       const link = botUsername

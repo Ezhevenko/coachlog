@@ -7,6 +7,7 @@ import { Calendar } from './ui/calendar'
 import { ArrowLeft, Edit3, Play, Dumbbell, TrendingUp } from 'lucide-react@0.487.0'
 import type { Client } from './App'
 import { ClientPackage } from './ClientPackage'
+const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
 
 interface TrainingProgramProps {
   client: Client
@@ -44,6 +45,7 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
   // key is ISO date string (YYYY-MM-DD)
   const [program, setProgram] = useState<Record<string, { id: string; exercises: string[]; startTime?: string; duration?: number }[]>>({})
   const [packageCount, setPackageCount] = useState(0)
+  const [inviteLink, setInviteLink] = useState<string | null>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -67,6 +69,25 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
     }
     load()
   }, [client.id])
+
+  useEffect(() => {
+    if (!client.telegram_id.startsWith('pending:')) {
+      setInviteLink(null)
+      return
+    }
+    const loadInvite = async () => {
+      const res = await apiFetch(`/api/coach/invites/${client.id}`)
+      if (!res.ok) return
+      const data = await res.json()
+      if (data.token) {
+        const link = botUsername
+          ? `https://t.me/${botUsername}?startapp=/invite/${data.token}`
+          : `${window.location.origin}/invite/${data.token}`
+        setInviteLink(link)
+      }
+    }
+    loadInvite()
+  }, [client.id, client.telegram_id])
 
   // Получаем день недели и ключ даты в формате ISO
   const selectedDayName = WEEKDAYS[selectedDate.getDay()]
@@ -215,6 +236,18 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, al
           )}
         </div>
       </Card>
+
+      {inviteLink && (
+        <Card className="p-4 mt-4 bg-white shadow-sm border-0 text-center">
+          <p className="text-sm text-gray-700 mb-2">Ссылка для приглашения</p>
+          <div className="flex items-center gap-2">
+            <span className="text-xs break-all flex-1">{inviteLink}</span>
+            <Button size="sm" onClick={() => navigator.clipboard.writeText(inviteLink)}>
+              Копировать
+            </Button>
+          </div>
+        </Card>
+      )}
     </div>
   )
 }
