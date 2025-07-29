@@ -28,16 +28,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   let user;
   if (inviteToken) {
-    const { data: invite } = await supabase
+    const { data: invite, error } = await supabase
       .from('client_invites')
       .select('client_id')
       .eq('token', inviteToken)
       .single();
+    if (error) {
+      console.error('Invite lookup error', error);
+      res.status(500).json({ error: 'database error' });
+      return;
+    }
     if (!invite) {
       res.status(400).json({ error: 'invalid invite' });
       return;
     }
-    await supabase.from('users').update({ telegram_id }).eq('id', invite.client_id);
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ telegram_id })
+      .eq('id', invite.client_id);
+    if (updateError) {
+      res.status(400).json({ error: updateError.message });
+      return;
+    }
     await supabase.from('client_invites').delete().eq('token', inviteToken);
     const { data } = await supabase.from('users').select('*').eq('id', invite.client_id).single();
     user = data;
