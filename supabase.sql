@@ -92,11 +92,13 @@ CREATE TABLE public.workout_exercises (
 CREATE TABLE public.workouts (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   client_id uuid,
+  coach_id uuid NOT NULL,
   date date NOT NULL,
   time_start time without time zone,
   duration_minutes integer,
   rounds integer DEFAULT 1,
   created_at timestamp without time zone DEFAULT now(),
   CONSTRAINT workouts_pkey PRIMARY KEY (id),
-  CONSTRAINT workouts_client_id_fkey FOREIGN KEY (client_id) REFERENCES public.users(id)
+  CONSTRAINT workouts_client_id_fkey FOREIGN KEY (client_id) REFERENCES public.users(id),
+  CONSTRAINT workouts_coach_id_fkey FOREIGN KEY (coach_id) REFERENCES public.users(id)
 );
