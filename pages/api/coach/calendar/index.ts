@@ -14,6 +14,10 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
       return;
     }
     const workoutIds = rows?.map(w => w.id) || [];
+    if (workoutIds.length === 0) {
+      res.status(200).json([]);
+      return;
+    }
     const { data: ex } = await supabase
       .from('workout_exercises')
       .select('workout_id,exercise_id')
