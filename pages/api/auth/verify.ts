@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { signToken } from '../../../lib/auth';
 import { supabase } from '../../../lib/supabase';
 import crypto from 'crypto';
+import { URLSearchParams } from 'url';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -13,8 +14,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(400).json({ error: 'initData required' });
     return;
   }
-  // simple stub: telegram_id from initData
-  const telegram_id = String(initData);
+  // parse Telegram user ID from initData
+  let telegram_id: string;
+  try {
+    const params = new URLSearchParams(initData);
+    const userStr = params.get('user');
+    if (!userStr) throw new Error('missing user');
+    const userObj = JSON.parse(userStr);
+    telegram_id = String(userObj.id);
+  } catch (e) {
+    res.status(400).json({ error: 'invalid initData' });
+    return;
+  }
   let user;
   if (inviteToken) {
     const { data: invite } = await supabase
