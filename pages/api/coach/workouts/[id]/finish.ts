@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { authMiddleware } from '../../../../../../lib/auth'
-import { supabase } from '../../../../../../lib/supabase'
+import { authMiddleware } from '../../../../../lib/auth'
+import { supabase } from '../../../../../lib/supabase'
 import crypto from 'crypto'
 
 async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse) {
