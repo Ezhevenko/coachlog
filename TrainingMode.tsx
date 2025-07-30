@@ -152,6 +152,15 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
     }
   }
 
+  const handleFinishWorkout = async () => {
+    if (!workoutId) return
+    const res = await apiFetch(`/api/coach/workouts/${workoutId}/finish`, {
+      method: 'POST'
+    })
+    if (res.ok) {
+      onBack()
+    }
+  }
   return (
     <div className="max-w-md mx-auto p-4 pt-8 pb-20">
       <div className="flex items-center justify-between mb-8">
@@ -310,6 +319,20 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
           <ChevronRight className="w-6 h-6" />
         </Button>
       </div>
+
+      {workoutId && (
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500 mb-2">
+            Нажмите, если тренировка проведена успешно. Из пакета будет списана 1 единица.
+          </p>
+          <Button
+            onClick={handleFinishWorkout}
+            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+          >
+            Завершить тренировку
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
