@@ -275,3 +275,15 @@ html {
   color: rgb(34, 197, 94);
   font-weight: bold;
 }
+
+/* Visible highlight for selected calendar day */
+.rdp-day_selected {
+  background-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+
+/* Selected dates from adjacent months */
+.rdp-day_outside.rdp-day_selected {
+  background-color: var(--color-muted);
+  color: var(--color-muted-foreground);
+}
