@@ -264,7 +264,7 @@ export default function App() {
 
       {activeRole === 'coach' &&
         ['calendar', 'clients', 'settings'].includes(currentView) && (
-          <div className="fixed bottom-0 left-0 right-0 border-t bg-white shadow">
+          <div className="fixed bottom-0 left-0 right-0 border-t bg-white shadow py-2">
             <Tabs
               value={currentView}
               onValueChange={(val) => setCurrentView(val as View)}
@@ -272,24 +272,24 @@ export default function App() {
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger
                   value="calendar"
-                  className="flex flex-col items-center gap-1 py-2"
+                  className="flex flex-col items-center gap-1 py-3 text-sm"
                 >
-                  <CalendarIcon className="w-5 h-5" />
-                  <span className="text-xs">Календарь</span>
+                  <CalendarIcon className="w-6 h-6" />
+                  <span className="text-sm">Календарь</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="clients"
-                  className="flex flex-col items-center gap-1 py-2"
+                  className="flex flex-col items-center gap-1 py-3 text-sm"
                 >
-                  <Users className="w-5 h-5" />
-                  <span className="text-xs">Клиенты</span>
+                  <Users className="w-6 h-6" />
+                  <span className="text-sm">Клиенты</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="settings"
-                  className="flex flex-col items-center gap-1 py-2"
+                  className="flex flex-col items-center gap-1 py-3 text-sm"
                 >
-                  <Settings className="w-5 h-5" />
-                  <span className="text-xs">Настройки</span>
+                  <Settings className="w-6 h-6" />
+                  <span className="text-sm">Настройки</span>
                 </TabsTrigger>
               </TabsList>
             </Tabs>
