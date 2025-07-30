@@ -28,6 +28,7 @@ interface TrainingProgramProps {
   ) => void
   onDeleteClient?: (clientId: string) => void
   allowEdit?: boolean
+  canStart?: boolean
 }
 
 const WEEKDAYS = [
@@ -40,7 +41,15 @@ const WEEKDAYS = [
   'Суббота'
 ]
 
-export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, onDeleteClient, allowEdit = true }: TrainingProgramProps) {
+export function TrainingProgram({
+  client,
+  onBack,
+  onOpenTraining,
+  onOpenEdit,
+  onDeleteClient,
+  allowEdit = true,
+  canStart = true
+}: TrainingProgramProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const apiFetch = useApiFetch()
   // key is ISO date string (YYYY-MM-DD)
@@ -141,7 +150,11 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, on
         )}
       </div>
 
-      <ClientPackage client={client} onCountChange={setPackageCount} />
+      <ClientPackage
+        client={client}
+        onCountChange={setPackageCount}
+        canEdit={allowEdit}
+      />
 
       {/* Calendar */}
       <Card className="p-4 mb-6 bg-white shadow-sm border-0">
@@ -217,13 +230,15 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, on
                     <span className="ml-2">{w.exercises.length} упр.</span>
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      size="icon"
-                      className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
-                      onClick={() => onOpenTraining(client, selectedDayName, selectedDateString, w.id)}
-                    >
-                      <Play className="w-4 h-4" />
-                    </Button>
+                    {canStart && (
+                      <Button
+                        size="icon"
+                        className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                        onClick={() => onOpenTraining(client, selectedDayName, selectedDateString, w.id)}
+                      >
+                        <Play className="w-4 h-4" />
+                      </Button>
+                    )}
                     {allowEdit && (
                       <Button
                         size="icon"

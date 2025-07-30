@@ -13,9 +13,18 @@ interface TrainingModeProps {
   workoutId?: string
   allExercises: Omit<Exercise, 'currentWeight' | 'currentReps' | 'history'>[]
   onBack: () => void
+  canRecord?: boolean
 }
 
-export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allExercises, onBack }: TrainingModeProps) {
+export function TrainingMode({
+  client,
+  day,
+  date,
+  workoutId: propWorkoutId,
+  allExercises,
+  onBack,
+  canRecord = true
+}: TrainingModeProps) {
   const apiFetch = useApiFetch()
   const [workoutId, setWorkoutId] = useState<string | null>(null)
   const [exercises, setExercises] = useState<Exercise[]>([])
@@ -239,6 +248,7 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
                 value={newWeight}
                 onChange={(e) => setNewWeight(e.target.value)}
                 className="w-full border-gray-200 focus:border-purple-300"
+                disabled={!canRecord}
               />
               <label className="text-sm font-medium text-gray-700">Повторения</label>
               <Input
@@ -247,6 +257,7 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
                 value={newReps}
                 onChange={(e) => setNewReps(e.target.value)}
                 className="w-full border-gray-200 focus:border-purple-300"
+                disabled={!canRecord}
               />
               <label className="text-sm font-medium text-gray-700">Кругов</label>
               <div className="flex gap-2 items-end">
@@ -256,10 +267,19 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
                   value={newRound}
                   onChange={(e) => setNewRound(e.target.value)}
                   className="flex-1 border-gray-200 focus:border-purple-300"
+                  disabled={!canRecord}
                 />
                 <Button
                   onClick={handleSaveProgress}
-                  disabled={!newWeight || !newReps || !newRound || parseFloat(newWeight) <= 0 || parseInt(newReps) <= 0 || parseInt(newRound) < 0}
+                  disabled={
+                    !canRecord ||
+                    !newWeight ||
+                    !newReps ||
+                    !newRound ||
+                    parseFloat(newWeight) <= 0 ||
+                    parseInt(newReps) <= 0 ||
+                    parseInt(newRound) < 0
+                  }
                   className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
                 >
                   <Save className="w-4 h-4" />
@@ -320,7 +340,7 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
         </Button>
       </div>
 
-      {workoutId && (
+      {workoutId && canRecord && (
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500 mb-2">
             Нажмите, если тренировка проведена успешно. Из пакета будет списана 1 единица.
