@@ -237,6 +237,7 @@ export default function App() {
           workoutId={currentWorkoutId}
           allExercises={allExercises}
           onBack={goBack}
+          canRecord={activeRole === 'coach'}
         />
       )}
       
