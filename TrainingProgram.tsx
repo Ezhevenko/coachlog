@@ -91,8 +91,13 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, on
   }, [client.id, client.telegram_id])
 
   // Получаем день недели и ключ даты в формате ISO
+  const toDateKey = (date: Date) => {
+    const tzOffset = date.getTimezoneOffset() * 60000
+    return new Date(date.getTime() - tzOffset).toISOString().slice(0, 10)
+  }
+
   const selectedDayName = WEEKDAYS[selectedDate.getDay()]
-  const selectedDateString = selectedDate.toISOString().slice(0, 10)
+  const selectedDateString = toDateKey(selectedDate)
   const selectedDayProgram = program[selectedDateString] || []
   const exerciseCount = selectedDayProgram.reduce(
     (sum, w) => sum + w.exercises.length,
@@ -100,11 +105,11 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, on
   )
 
   // Функция для определения, есть ли тренировки в конкретный день
-  const hasTrainingOnDate = (date: Date) => {
-    const key = date.toISOString().slice(0, 10)
-    const dayProgram = program[key]
-    return (dayProgram?.length || 0) > 0
-  }
+    const hasTrainingOnDate = (date: Date) => {
+      const key = toDateKey(date)
+      const dayProgram = program[key]
+      return (dayProgram?.length || 0) > 0
+    }
 
   return (
     <div className="max-w-md mx-auto p-4 pt-6 pb-6 min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">

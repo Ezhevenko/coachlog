@@ -61,7 +61,12 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
     load()
   }, [clients])
 
-  const selectedDateStr = selectedDate.toISOString().slice(0, 10)
+  const toDateKey = (date: Date) => {
+    const tzOffset = date.getTimezoneOffset() * 60000
+    return new Date(date.getTime() - tzOffset).toISOString().slice(0, 10)
+  }
+
+  const selectedDateStr = toDateKey(selectedDate)
   const selectedDayName = WEEKDAYS[selectedDate.getDay()]
   const dayWorkouts = workoutsByDate[selectedDateStr] || []
   const sortedWorkouts = [...dayWorkouts].sort((a, b) =>
@@ -71,7 +76,7 @@ export function CoachCalendar({ clients, onOpenTraining, onOpenEdit }: CoachCale
   const clientMap = Object.fromEntries(clients.map(c => [c.id, c])) as Record<string, Client>
 
   const hasTrainingOnDate = (date: Date) => {
-    const key = date.toISOString().slice(0, 10)
+    const key = toDateKey(date)
     return (workoutsByDate[key]?.length || 0) > 0
   }
 
