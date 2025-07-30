@@ -172,10 +172,10 @@ export function ExerciseSettings({ categories, onUpdateCategories, onBack }: Exe
           <Button
             onClick={onBack}
             variant="ghost"
-            size="sm"
-            className="p-2 hover:bg-blue-100"
+            size="icon"
+            className="hover:bg-blue-100"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-6 h-6" />
           </Button>
           <div>
             <h1 className="text-lg font-bold text-gray-800">Упражнения</h1>

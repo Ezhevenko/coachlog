@@ -354,8 +354,8 @@ export function EditTrainingMode({
     <DndProvider backend={HTML5Backend}>
       <div className="max-w-md mx-auto p-4 pt-8 pb-20">
         <div className="flex items-center justify-between mb-6">
-          <Button onClick={onBack} variant="ghost" size="sm" className="p-2">
-            <ArrowLeft className="w-5 h-5" />
+          <Button onClick={onBack} variant="ghost" size="icon">
+            <ArrowLeft className="w-6 h-6" />
           </Button>
           <div className="text-center">
             <h1 className="font-bold text-gray-800">Редактирование</h1>

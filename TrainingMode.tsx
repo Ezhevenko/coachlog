@@ -74,8 +74,8 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
     return (
       <div className="max-w-md mx-auto p-4 pt-8">
         <div className="flex items-center justify-between mb-8">
-          <Button onClick={onBack} variant="ghost" size="sm" className="p-2">
-            <ArrowLeft className="w-5 h-5" />
+          <Button onClick={onBack} variant="ghost" size="icon">
+            <ArrowLeft className="w-6 h-6" />
           </Button>
           <h1 className="font-bold text-gray-800">
             {day}, {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
@@ -155,8 +155,8 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
   return (
     <div className="max-w-md mx-auto p-4 pt-8 pb-20">
       <div className="flex items-center justify-between mb-8">
-        <Button onClick={onBack} variant="ghost" size="sm" className="p-2">
-          <ArrowLeft className="w-5 h-5" />
+        <Button onClick={onBack} variant="ghost" size="icon">
+          <ArrowLeft className="w-6 h-6" />
         </Button>
         <div className="text-center">
           <h1 className="font-bold text-gray-800">

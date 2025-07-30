@@ -119,10 +119,10 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, on
           <Button
             onClick={onBack}
             variant="ghost"
-            size="sm"
-            className="p-2 hover:bg-blue-100"
+            size="icon"
+            className="hover:bg-blue-100"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-6 h-6" />
           </Button>
           <div>
             <h1 className="text-lg font-bold text-gray-800">{client.name}</h1>
