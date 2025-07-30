@@ -36,21 +36,21 @@ export function ClientDashboard({ client, allExercises, onBack, onOpenTraining }
           <TabsTrigger value="schedule">Расписание</TabsTrigger>
           <TabsTrigger value="progress">Прогресс</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="schedule">
+          <TrainingProgram
+            client={client}
+            onBack={() => {}}
+            onOpenTraining={onOpenTraining}
+            onOpenEdit={(d, dt) => {}}
+            allowEdit={false}
+          />
+        </TabsContent>
+
+        <TabsContent value="progress">
+          <ProgressView client={client} allExercises={allExercises} />
+        </TabsContent>
       </Tabs>
-
-      <TabsContent value="schedule">
-        <TrainingProgram
-          client={client}
-          onBack={() => {}}
-          onOpenTraining={onOpenTraining}
-          onOpenEdit={(d, dt) => {}}
-          allowEdit={false}
-        />
-      </TabsContent>
-
-      <TabsContent value="progress">
-        <ProgressView client={client} allExercises={allExercises} />
-      </TabsContent>
 
       <InviteLinkCard client={client} />
     </div>
