@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react'
 import { useApiFetch } from './lib/api'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
-import { WorkoutCard } from './WorkoutCard'
-import { Calendar } from './ui/calendar'
-import { ArrowLeft, Edit3, Play, Dumbbell, TrendingUp, Trash2 } from 'lucide-react@0.487.0'
+import WorkoutCalendar from './components/WorkoutCalendar'
+import { ArrowLeft, Trash2 } from 'lucide-react@0.487.0'
 import type { Client } from './App'
 import { ClientPackage } from './ClientPackage'
 const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
@@ -31,6 +30,7 @@ interface TrainingProgramProps {
   canStart?: boolean
 }
 
+
 const WEEKDAYS = [
   'Воскресенье',
   'Понедельник',
@@ -51,34 +51,10 @@ export function TrainingProgram({
   canStart = true
 }: TrainingProgramProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+
   const apiFetch = useApiFetch()
-  // key is ISO date string (YYYY-MM-DD)
-  const [program, setProgram] = useState<Record<string, { id: string; exercises: string[]; startTime?: string; duration?: number }[]>>({})
-  const [packageCount, setPackageCount] = useState(0)
   const [inviteLink, setInviteLink] = useState<string | null>(null)
 
-  useEffect(() => {
-    const load = async () => {
-      const res = await apiFetch('/api/coach/calendar')
-      if (!res.ok) return
-      const data = await res.json()
-      const map: Record<string, { id: string; exercises: string[]; startTime?: string; duration?: number }[]> = {}
-      data
-        .filter((w: any) => w.clientId === client.id)
-        .forEach((w: any) => {
-          const dateStr = (w.date || '').slice(0, 10)
-          if (!dateStr) return
-          ;(map[dateStr] ||= []).push({
-            id: w.id,
-            exercises: w.exerciseIds || [],
-            startTime: w.time_start || undefined,
-            duration: w.duration_minutes || undefined
-          })
-        })
-      setProgram(map)
-    }
-    load()
-  }, [client.id])
 
   useEffect(() => {
     if (!client.telegram_id.startsWith('pending:')) {
@@ -99,26 +75,6 @@ export function TrainingProgram({
     loadInvite()
   }, [client.id, client.telegram_id])
 
-  // Получаем день недели и ключ даты в формате ISO
-  const toDateKey = (date: Date) => {
-    const tzOffset = date.getTimezoneOffset() * 60000
-    return new Date(date.getTime() - tzOffset).toISOString().slice(0, 10)
-  }
-
-  const selectedDayName = WEEKDAYS[selectedDate.getDay()]
-  const selectedDateString = toDateKey(selectedDate)
-  const selectedDayProgram = program[selectedDateString] || []
-  const exerciseCount = selectedDayProgram.reduce(
-    (sum, w) => sum + w.exercises.length,
-    0
-  )
-
-  // Функция для определения, есть ли тренировки в конкретный день
-    const hasTrainingOnDate = (date: Date) => {
-      const key = toDateKey(date)
-      const dayProgram = program[key]
-      return (dayProgram?.length || 0) > 0
-    }
 
   return (
     <div className="max-w-md mx-auto p-4 pt-6 pb-6 min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
@@ -267,6 +223,7 @@ export function TrainingProgram({
           )}
         </div>
       </Card>
+
 
       {inviteLink && (
         <Card className="p-4 mt-4 bg-white shadow-sm border-0 text-center">

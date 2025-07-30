@@ -265,29 +265,29 @@ export default function App() {
 
       {activeRole === 'coach' &&
         ['calendar', 'clients', 'settings'].includes(currentView) && (
-          <div className="fixed bottom-0 left-0 right-0 border-t bg-white shadow py-2">
+          <div className="fixed bottom-0 left-0 right-0 border-t bg-white shadow pb-[env(safe-area-inset-bottom)]">
             <Tabs
               value={currentView}
               onValueChange={(val) => setCurrentView(val as View)}
             >
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-3 h-14">
                 <TabsTrigger
                   value="calendar"
-                  className="flex flex-col items-center gap-1 py-3 text-sm"
+                  className="flex flex-col items-center justify-center gap-1 h-full text-sm"
                 >
                   <CalendarIcon className="w-6 h-6" />
                   <span className="text-sm">Календарь</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="clients"
-                  className="flex flex-col items-center gap-1 py-3 text-sm"
+                  className="flex flex-col items-center justify-center gap-1 h-full text-sm"
                 >
                   <Users className="w-6 h-6" />
                   <span className="text-sm">Клиенты</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="settings"
-                  className="flex flex-col items-center gap-1 py-3 text-sm"
+                  className="flex flex-col items-center justify-center gap-1 h-full text-sm"
                 >
                   <Settings className="w-6 h-6" />
                   <span className="text-sm">Настройки</span>
