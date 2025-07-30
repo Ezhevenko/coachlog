@@ -24,6 +24,8 @@ r = spawnSync('npx', ['ts-node', '-r', 'tsconfig-paths/register', '--compiler-op
 if (r.status !== 0) process.exit(r.status)
 r = spawnSync('npx', ['ts-node', '-r', 'tsconfig-paths/register', '--compiler-options', '{"module":"commonjs"}', 'test/packageUsage.test.ts'], { stdio: 'inherit', env })
 if (r.status !== 0) process.exit(r.status)
+r = spawnSync('npx', ['ts-node', '-r', 'tsconfig-paths/register', '--compiler-options', '{"module":"commonjs"}', 'test/packageCron.test.ts'], { stdio: 'inherit', env })
+if (r.status !== 0) process.exit(r.status)
 r = spawnSync(
   'npx',
   [
