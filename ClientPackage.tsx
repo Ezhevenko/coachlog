@@ -9,7 +9,15 @@ interface HistoryItem { id: string; delta: number; created_at: string }
 
 interface PackageInfo { count: number; history: HistoryItem[] }
 
-export function ClientPackage({ client, onCountChange }: { client: Client; onCountChange?: (n: number) => void }) {
+export function ClientPackage({
+  client,
+  onCountChange,
+  canEdit = true
+}: {
+  client: Client
+  onCountChange?: (n: number) => void
+  canEdit?: boolean
+}) {
   const apiFetch = useApiFetch()
   const [info, setInfo] = useState<PackageInfo>({ count: 0, history: [] })
   const [delta, setDelta] = useState('')
@@ -46,15 +54,17 @@ export function ClientPackage({ client, onCountChange }: { client: Client; onCou
         <span className="text-2xl font-bold">{info.count}</span>
         <span className="text-gray-600">занятий</span>
       </div>
-      <div className="flex gap-2 mb-4">
-        <Input
-          type="number"
-          value={delta}
-          onChange={e => setDelta(e.target.value)}
-          className="flex-1 border-gray-200 focus:border-blue-300"
-        />
-        <Button onClick={handleSave} disabled={!delta}>Сохранить</Button>
-      </div>
+      {canEdit && (
+        <div className="flex gap-2 mb-4">
+          <Input
+            type="number"
+            value={delta}
+            onChange={e => setDelta(e.target.value)}
+            className="flex-1 border-gray-200 focus:border-blue-300"
+          />
+          <Button onClick={handleSave} disabled={!delta}>Сохранить</Button>
+        </div>
+      )}
       {info.history.length > 0 && (
         <div className="text-sm max-h-32 overflow-y-auto space-y-1">
           {info.history.map(h => (

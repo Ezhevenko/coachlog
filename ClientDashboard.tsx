@@ -44,6 +44,7 @@ export function ClientDashboard({ client, allExercises, onBack, onOpenTraining }
             onOpenTraining={onOpenTraining}
             onOpenEdit={(d, dt) => {}}
             allowEdit={false}
+            canStart={false}
           />
         </TabsContent>
 
