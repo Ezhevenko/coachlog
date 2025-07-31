@@ -8,7 +8,7 @@ import { EditTrainingMode } from './EditTrainingMode'
 import { ExerciseSettings } from './ExerciseSettings'
 import { ClientDashboard } from './ClientDashboard'
 import CoachCalendar from './CoachCalendar'
-import { RoleSwitcher, Role } from './RoleSwitcher'
+import type { Role } from './RoleSwitcher'
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs'
 import { Calendar as CalendarIcon, Users, Settings } from 'lucide-react@0.487.0'
 
@@ -188,9 +188,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-indigo-50">
-      <div className="p-4">
-        <RoleSwitcher role={activeRole} onChange={handleRoleChange} />
-      </div>
+
 
       {activeRole === 'coach' && currentView === 'calendar' && (
         <CoachCalendar
@@ -262,6 +260,8 @@ export default function App() {
           categories={exerciseCategories}
           onUpdateCategories={updateExerciseCategories}
           onBack={goBack}
+          activeRole={activeRole}
+          onRoleChange={handleRoleChange}
         />
       )}
 

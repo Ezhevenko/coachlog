@@ -10,14 +10,17 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
 import { ArrowLeft, Plus, X, Edit3, Dumbbell, FolderPlus, Trash2 } from 'lucide-react@0.487.0'
 import type { ExerciseCategory } from './App'
+import { Role, RoleSwitcher } from './RoleSwitcher'
 
 interface ExerciseSettingsProps {
   categories: ExerciseCategory[]
   onUpdateCategories: (categories: ExerciseCategory[]) => void
   onBack: () => void
+  activeRole: Role
+  onRoleChange: (role: Role) => void
 }
 
-export function ExerciseSettings({ categories, onUpdateCategories, onBack }: ExerciseSettingsProps) {
+export function ExerciseSettings({ categories, onUpdateCategories, onBack, activeRole, onRoleChange }: ExerciseSettingsProps) {
   const apiFetch = useApiFetch()
   const [list, setList] = useState<ExerciseCategory[]>(categories)
   const [showAddCategory, setShowAddCategory] = useState(false)
@@ -29,6 +32,15 @@ export function ExerciseSettings({ categories, onUpdateCategories, onBack }: Exe
   const [newExerciseName, setNewExerciseName] = useState('')
   const [editCategoryName, setEditCategoryName] = useState('')
   const [editExerciseName, setEditExerciseName] = useState('')
+
+  const handleRoleSwitch = async (role: Role) => {
+    onRoleChange(role)
+    await apiFetch('/api/auth/set-role', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role })
+    })
+  }
 
   useEffect(() => {
     const load = async () => {
@@ -182,6 +194,10 @@ export function ExerciseSettings({ categories, onUpdateCategories, onBack }: Exe
             <p className="text-sm text-blue-600">Управление категориями и упражнениями</p>
           </div>
         </div>
+      </div>
+
+      <div className="mb-4 flex justify-end">
+        <RoleSwitcher role={activeRole} onChange={handleRoleSwitch} />
       </div>
 
       {/* Add Category Button */}

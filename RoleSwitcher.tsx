@@ -1,4 +1,4 @@
-import { Tabs, TabsList, TabsTrigger } from './ui/tabs'
+import { Switch } from './ui/switch'
 
 export type Role = 'coach' | 'client'
 
@@ -9,11 +9,13 @@ interface RoleSwitcherProps {
 
 export function RoleSwitcher({ role, onChange }: RoleSwitcherProps) {
   return (
-    <Tabs value={role} onValueChange={(val: string) => onChange(val as Role)} className="mb-4">
-      <TabsList>
-        <TabsTrigger value="coach">Тренер</TabsTrigger>
-        <TabsTrigger value="client">Клиент</TabsTrigger>
-      </TabsList>
-    </Tabs>
+    <div className="flex items-center gap-2">
+      <span className="text-sm">Клиент</span>
+      <Switch
+        checked={role === 'coach'}
+        onCheckedChange={(checked) => onChange(checked ? 'coach' : 'client')}
+      />
+      <span className="text-sm">Тренер</span>
+    </div>
   )
 }
