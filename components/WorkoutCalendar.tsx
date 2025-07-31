@@ -83,7 +83,8 @@ export function WorkoutCalendar({
           className="rounded-md"
           modifiersClassNames={{ hasTraining: 'rdp-day_hasTraining' }}
           classNames={{
-            day_selected: 'bg-blue-500 text-white hover:bg-blue-600 focus:bg-blue-600'
+            day_selected:
+              'rdp-day_selected bg-blue-500 text-white hover:bg-blue-600 focus:bg-blue-600'
           }}
           modifiers={{
             hasTraining: (date: Date) => hasTrainingOnDate(date)
