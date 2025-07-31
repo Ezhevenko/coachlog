@@ -4,6 +4,10 @@ import { supabase } from './supabase';
 
 const SECRET = process.env.JWT_SECRET || 'changeme';
 
+if (process.env.JWT_SECRET === 'changeme') {
+  console.warn('Warning: JWT_SECRET is using the default value. Set a strong secret before deployment.');
+}
+
 export function signToken(userId: string) {
   return jwt.sign({ sub: userId }, SECRET, { expiresIn: '1d' });
 }
