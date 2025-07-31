@@ -237,6 +237,7 @@ export default function App() {
           onDeleteClient={deleteClientAndReturn}
           allowEdit={true}
           allowStart={true}
+          hideBackButton
         />
       )}
 
@@ -303,10 +304,10 @@ export default function App() {
         )}
 
       {activeRole === 'coach' &&
-        ['calendar', 'clients', 'settings'].includes(currentView) && (
+        ['calendar', 'clients', 'settings', 'program'].includes(currentView) && (
           <div className="fixed bottom-0 left-0 right-0 border-t bg-white shadow pb-[env(safe-area-inset-bottom)]">
             <Tabs
-              value={currentView}
+              value={currentView === 'program' ? 'clients' : currentView}
               onValueChange={(val) => setCurrentView(val as View)}
             >
               <TabsList className="grid w-full grid-cols-3 h-14">

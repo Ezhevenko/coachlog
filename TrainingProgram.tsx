@@ -29,6 +29,7 @@ interface TrainingProgramProps {
   allowEdit?: boolean
   allowStart?: boolean
   hideHeader?: boolean
+  hideBackButton?: boolean
 }
 
 export function TrainingProgram({
@@ -39,7 +40,8 @@ export function TrainingProgram({
   onDeleteClient,
   allowEdit = true,
   allowStart = true,
-  hideHeader = false
+  hideHeader = false,
+  hideBackButton = false
 }: TrainingProgramProps) {
   const apiFetch = useApiFetch()
   const [inviteLink, setInviteLink] = useState<string | null>(null)
@@ -70,14 +72,16 @@ export function TrainingProgram({
       {!hideHeader && (
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
-            <Button
-              onClick={onBack}
-              variant="ghost"
-              size="icon"
-              className="hover:bg-blue-100"
-            >
-              <ArrowLeft className="w-6 h-6" />
-            </Button>
+            {!hideBackButton && (
+              <Button
+                onClick={onBack}
+                variant="ghost"
+                size="icon"
+                className="hover:bg-blue-100"
+              >
+                <ArrowLeft className="w-6 h-6" />
+              </Button>
+            )}
             <div>
               <h1 className="text-lg font-bold text-gray-800">{client.name}</h1>
               <p className="text-sm text-blue-600">Программа тренировок</p>
