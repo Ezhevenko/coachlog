@@ -17,8 +17,13 @@ interface Workout {
 
 interface WorkoutCalendarProps {
   clients: Client[]
-  onOpenTraining: (client: Client, day: string, date: string, workoutId?: string) => void
-  onOpenEdit: (
+  onOpenTraining?: (
+    client: Client,
+    day: string,
+    date: string,
+    workoutId?: string
+  ) => void
+  onOpenEdit?: (
     client: Client,
     day: string,
     date: string,
@@ -104,8 +109,16 @@ export function WorkoutCalendar({
               key={w.id}
               clientName={hideClientName ? undefined : client.name}
               startTime={w.time_start ? w.time_start.slice(0, 5) : undefined}
-              onStart={() => onOpenTraining(client, selectedDayName, selectedDateStr, w.id)}
-              onEdit={() => onOpenEdit(client, selectedDayName, selectedDateStr, w.id)}
+              onStart={
+                onOpenTraining
+                  ? () => onOpenTraining(client, selectedDayName, selectedDateStr, w.id)
+                  : undefined
+              }
+              onEdit={
+                onOpenEdit
+                  ? () => onOpenEdit(client, selectedDayName, selectedDateStr, w.id)
+                  : undefined
+              }
             />
           )
         })}
