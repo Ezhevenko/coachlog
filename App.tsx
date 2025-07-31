@@ -231,7 +231,6 @@ export default function App() {
       {activeRole === 'coach' && currentView === 'program' && selectedClient && (
         <TrainingProgram
           client={selectedClient}
-          onBack={goBack}
           onOpenTraining={openTrainingMode}
           onOpenEdit={openEditMode}
           onDeleteClient={deleteClientAndReturn}
@@ -245,7 +244,6 @@ export default function App() {
         selectedClient && (
           <TrainingProgram
             client={selectedClient}
-            onBack={() => {}}
             onOpenTraining={openTrainingMode}
             onOpenEdit={() => {}}
             allowEdit={false}

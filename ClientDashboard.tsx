@@ -40,7 +40,6 @@ export function ClientDashboard({ client, allExercises, onBack, onOpenTraining }
         <TabsContent value="schedule">
           <TrainingProgram
             client={client}
-            onBack={() => {}}
             onOpenTraining={onOpenTraining}
             onOpenEdit={(d, dt) => {}}
             allowEdit={false}
