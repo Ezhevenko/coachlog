@@ -27,9 +27,18 @@ interface TrainingProgramProps {
   ) => void
   onDeleteClient?: (clientId: string) => void
   allowEdit?: boolean
+  allowStart?: boolean
 }
 
-export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, onDeleteClient, allowEdit = true }: TrainingProgramProps) {
+export function TrainingProgram({
+  client,
+  onBack,
+  onOpenTraining,
+  onOpenEdit,
+  onDeleteClient,
+  allowEdit = true,
+  allowStart = true
+}: TrainingProgramProps) {
   const apiFetch = useApiFetch()
   const [inviteLink, setInviteLink] = useState<string | null>(null)
 
@@ -84,13 +93,13 @@ export function TrainingProgram({ client, onBack, onOpenTraining, onOpenEdit, on
         )}
       </div>
 
-      <ClientPackage client={client} />
+      <ClientPackage client={client} editable={allowEdit} />
 
       <WorkoutCalendar
         clients={[client]}
         clientId={client.id}
-        onOpenTraining={onOpenTraining}
-        onOpenEdit={onOpenEdit}
+        onOpenTraining={allowStart ? onOpenTraining : undefined}
+        onOpenEdit={allowEdit ? onOpenEdit : undefined}
         hideClientName
       />
 

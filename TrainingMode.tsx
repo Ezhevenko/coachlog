@@ -13,9 +13,18 @@ interface TrainingModeProps {
   workoutId?: string
   allExercises: Omit<Exercise, 'currentWeight' | 'currentReps' | 'history'>[]
   onBack: () => void
+  canFinish?: boolean
 }
 
-export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allExercises, onBack }: TrainingModeProps) {
+export function TrainingMode({
+  client,
+  day,
+  date,
+  workoutId: propWorkoutId,
+  allExercises,
+  onBack,
+  canFinish = true
+}: TrainingModeProps) {
   const apiFetch = useApiFetch()
   const [workoutId, setWorkoutId] = useState<string | null>(null)
   const [exercises, setExercises] = useState<Exercise[]>([])
@@ -320,7 +329,7 @@ export function TrainingMode({ client, day, date, workoutId: propWorkoutId, allE
         </Button>
       </div>
 
-      {workoutId && (
+      {workoutId && canFinish && (
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500 mb-2">
             Нажмите, если тренировка проведена успешно. Из пакета будет списана 1 единица.

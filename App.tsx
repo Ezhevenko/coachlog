@@ -217,6 +217,8 @@ export default function App() {
           onOpenTraining={openTrainingMode}
           onOpenEdit={openEditMode}
           onDeleteClient={deleteClientAndReturn}
+          allowEdit={true}
+          allowStart={true}
         />
       )}
 
@@ -237,6 +239,7 @@ export default function App() {
           workoutId={currentWorkoutId}
           allExercises={allExercises}
           onBack={goBack}
+          canFinish={activeRole === 'coach'}
         />
       )}
       

@@ -7,7 +7,7 @@ interface WorkoutCardProps {
   startTime?: string
   duration?: string | number
   exerciseCount?: number
-  onStart: () => void
+  onStart?: () => void
   onEdit?: () => void
   hideName?: boolean
 }
@@ -38,13 +38,15 @@ export function WorkoutCard({
         )}
       </div>
       <div className="flex gap-2">
-        <Button
-          size="icon"
-          className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
-          onClick={onStart}
-        >
-          <Play className="w-4 h-4" />
-        </Button>
+        {onStart && (
+          <Button
+            size="icon"
+            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+            onClick={onStart}
+          >
+            <Play className="w-4 h-4" />
+          </Button>
+        )}
         {onEdit && (
           <Button
             size="icon"
