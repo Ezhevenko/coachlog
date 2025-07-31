@@ -9,7 +9,6 @@ import { ExerciseSettings } from './ExerciseSettings'
 import { ProgressView } from './ProgressView'
 import CoachCalendar from './CoachCalendar'
 import type { Role } from './RoleSwitcher'
-import { RoleSwitcher } from './RoleSwitcher'
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs'
 import {
   Calendar as CalendarIcon,
@@ -182,10 +181,6 @@ export default function App() {
     setCurrentView('edit')
   }
 
-  const openExerciseSettings = () => {
-    setCurrentView('settings')
-  }
-
   const goBack = () => {
     if (currentView === 'training' || currentView === 'edit') {
       setCurrentWorkoutId(undefined)
@@ -206,9 +201,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-indigo-50">
-      <div className="fixed top-0 right-0 p-4">
-        <RoleSwitcher role={activeRole} onChange={handleRoleChange} />
-      </div>
 
       {activeRole === 'coach' && currentView === 'calendar' && (
         <CoachCalendar
@@ -224,7 +216,6 @@ export default function App() {
           onAddClient={addClient}
           onDeleteClient={deleteClient}
           onSelectClient={openClientProgram}
-          onOpenSettings={openExerciseSettings}
         />
       )}
 
@@ -237,6 +228,7 @@ export default function App() {
           onDeleteClient={deleteClientAndReturn}
           allowEdit={true}
           allowStart={true}
+          hideBackButton
         />
       )}
 
@@ -303,10 +295,10 @@ export default function App() {
         )}
 
       {activeRole === 'coach' &&
-        ['calendar', 'clients', 'settings'].includes(currentView) && (
+        ['calendar', 'clients', 'settings', 'program'].includes(currentView) && (
           <div className="fixed bottom-0 left-0 right-0 border-t bg-white shadow pb-[env(safe-area-inset-bottom)]">
             <Tabs
-              value={currentView}
+              value={currentView === 'program' ? 'clients' : currentView}
               onValueChange={(val) => setCurrentView(val as View)}
             >
               <TabsList className="grid w-full grid-cols-3 h-14">
