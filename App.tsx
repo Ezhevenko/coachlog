@@ -6,11 +6,17 @@ import { TrainingProgram } from './TrainingProgram'
 import { TrainingMode } from './TrainingMode'
 import { EditTrainingMode } from './EditTrainingMode'
 import { ExerciseSettings } from './ExerciseSettings'
-import { ClientDashboard } from './ClientDashboard'
+import { ProgressView } from './ProgressView'
 import CoachCalendar from './CoachCalendar'
 import type { Role } from './RoleSwitcher'
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs'
-import { Calendar as CalendarIcon, Users, Settings } from 'lucide-react@0.487.0'
+import {
+  Calendar as CalendarIcon,
+  Users,
+  Settings,
+  TrendingUp
+} from 'lucide-react@0.487.0'
+import { ClientSettings } from './ClientSettings'
 
 const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
 
@@ -35,7 +41,16 @@ export interface Client {
   telegram_id: string
 }
 
-type View = 'calendar' | 'clients' | 'program' | 'training' | 'edit' | 'settings' | 'client'
+type View =
+  | 'calendar'
+  | 'clients'
+  | 'program'
+  | 'training'
+  | 'edit'
+  | 'settings'
+  | 'client-schedule'
+  | 'client-progress'
+  | 'client-settings'
 
 export default function App() {
   const [clients, setClients] = useState<Client[]>([])
@@ -86,7 +101,7 @@ export default function App() {
     setActiveRole(role)
     if (role === 'client') {
       setSelectedClient(clients[0] || null)
-      setCurrentView('client')
+      setCurrentView('client-schedule')
     } else {
       setCurrentView('calendar')
       setSelectedClient(null)
@@ -179,6 +194,8 @@ export default function App() {
       setSelectedClient(null)
     } else if (currentView === 'settings') {
       setCurrentView('calendar')
+    } else if (currentView === 'client-settings') {
+      setCurrentView('client-schedule')
     }
   }
 
@@ -220,13 +237,30 @@ export default function App() {
         />
       )}
 
-      {activeRole === 'client' && currentView === 'client' && selectedClient && (
-        <ClientDashboard
-          client={selectedClient}
-          allExercises={allExercises}
-          onBack={() => setCurrentView('client')}
-          onOpenTraining={openTrainingMode}
-        />
+      {activeRole === 'client' &&
+        currentView === 'client-schedule' &&
+        selectedClient && (
+          <TrainingProgram
+            client={selectedClient}
+            onBack={() => {}}
+            onOpenTraining={openTrainingMode}
+            onOpenEdit={() => {}}
+            allowEdit={false}
+            allowStart={false}
+            hideHeader
+          />
+        )}
+
+      {activeRole === 'client' &&
+        currentView === 'client-progress' &&
+        selectedClient && (
+          <div className="max-w-md mx-auto p-4 pt-6 pb-6 min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
+            <ProgressView client={selectedClient} allExercises={allExercises} />
+          </div>
+        )}
+
+      {activeRole === 'client' && currentView === 'client-settings' && (
+        <ClientSettings role={activeRole} onRoleChange={handleRoleChange} />
       )}
 
       {currentView === 'training' && selectedClient && (
@@ -263,7 +297,7 @@ export default function App() {
           activeRole={activeRole}
           onRoleChange={handleRoleChange}
         />
-      )}
+        )}
 
       {activeRole === 'coach' &&
         ['calendar', 'clients', 'settings'].includes(currentView) && (
@@ -289,6 +323,37 @@ export default function App() {
                 </TabsTrigger>
                 <TabsTrigger
                   value="settings"
+                  className="flex flex-col items-center justify-center gap-1 h-full text-sm"
+                >
+                  <Settings className="w-6 h-6" />
+                  <span className="text-sm">Настройки</span>
+                </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      )}
+
+      {activeRole === 'client' &&
+        ['client-schedule', 'client-progress', 'client-settings'].includes(currentView) && (
+          <div className="fixed bottom-0 left-0 right-0 border-t bg-white shadow pb-[env(safe-area-inset-bottom)]">
+            <Tabs value={currentView} onValueChange={(val) => setCurrentView(val as View)}>
+              <TabsList className="grid w-full grid-cols-3 h-14">
+                <TabsTrigger
+                  value="client-schedule"
+                  className="flex flex-col items-center justify-center gap-1 h-full text-sm"
+                >
+                  <CalendarIcon className="w-6 h-6" />
+                  <span className="text-sm">Расписание</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="client-progress"
+                  className="flex flex-col items-center justify-center gap-1 h-full text-sm"
+                >
+                  <TrendingUp className="w-6 h-6" />
+                  <span className="text-sm">Прогресс</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="client-settings"
                   className="flex flex-col items-center justify-center gap-1 h-full text-sm"
                 >
                   <Settings className="w-6 h-6" />
