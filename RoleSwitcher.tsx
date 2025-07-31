@@ -1,3 +1,5 @@
+"use client";
+
 import { Switch } from './ui/switch'
 
 export type Role = 'coach' | 'client'

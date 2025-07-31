@@ -9,6 +9,7 @@ import { ExerciseSettings } from './ExerciseSettings'
 import { ProgressView } from './ProgressView'
 import CoachCalendar from './CoachCalendar'
 import type { Role } from './RoleSwitcher'
+import { RoleSwitcher } from './RoleSwitcher'
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs'
 import {
   Calendar as CalendarIcon,
@@ -205,7 +206,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-indigo-50">
-
+      <div className="fixed top-0 right-0 p-4">
+        <RoleSwitcher role={activeRole} onChange={handleRoleChange} />
+      </div>
 
       {activeRole === 'coach' && currentView === 'calendar' && (
         <CoachCalendar
