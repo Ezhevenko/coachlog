@@ -1,6 +1,6 @@
 "use client";
 
-import { Switch } from './ui/switch'
+// Simple checkbox-based toggle instead of Radix Switch
 
 export type Role = 'coach' | 'client'
 
@@ -11,13 +11,15 @@ interface RoleSwitcherProps {
 
 export function RoleSwitcher({ role, onChange }: RoleSwitcherProps) {
   return (
-    <div className="flex items-center gap-2">
+    <label className="flex items-center gap-2">
       <span className="text-sm">Клиент</span>
-      <Switch
+      <input
+        type="checkbox"
         checked={role === 'coach'}
-        onCheckedChange={(checked) => onChange(checked ? 'coach' : 'client')}
+        onChange={(e) => onChange(e.target.checked ? 'coach' : 'client')}
+        className="h-4 w-4"
       />
       <span className="text-sm">Тренер</span>
-    </div>
+    </label>
   )
 }
