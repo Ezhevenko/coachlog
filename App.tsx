@@ -181,10 +181,6 @@ export default function App() {
     setCurrentView('edit')
   }
 
-  const openExerciseSettings = () => {
-    setCurrentView('settings')
-  }
-
   const goBack = () => {
     if (currentView === 'training' || currentView === 'edit') {
       setCurrentWorkoutId(undefined)
@@ -220,7 +216,6 @@ export default function App() {
           onAddClient={addClient}
           onDeleteClient={deleteClient}
           onSelectClient={openClientProgram}
-          onOpenSettings={openExerciseSettings}
         />
       )}
 

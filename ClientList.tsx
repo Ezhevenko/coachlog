@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Card } from './ui/card'
-import { Plus, Trash2, User, Settings } from 'lucide-react@0.487.0'
+import { Plus, Trash2, User } from 'lucide-react@0.487.0'
 import type { Client } from './App'
 
 interface ClientListProps {
@@ -10,10 +10,9 @@ interface ClientListProps {
   onAddClient: (name: string) => void
   onDeleteClient: (clientId: string) => void
   onSelectClient: (client: Client) => void
-  onOpenSettings: () => void
 }
 
-export function ClientList({ clients, onAddClient, onDeleteClient, onSelectClient, onOpenSettings }: ClientListProps) {
+export function ClientList({ clients, onAddClient, onDeleteClient, onSelectClient }: ClientListProps) {
   const [showAddForm, setShowAddForm] = useState(false)
   const [newClientName, setNewClientName] = useState('')
   const [selectedForDelete, setSelectedForDelete] = useState<string | null>(null)
@@ -72,13 +71,6 @@ export function ClientList({ clients, onAddClient, onDeleteClient, onSelectClien
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold text-gray-800">Мои клиенты</h1>
         <div className="flex gap-2">
-          <Button
-            onClick={onOpenSettings}
-            variant="outline"
-            className="rounded-full w-12 h-12 border-blue-200 text-blue-600 hover:bg-blue-50"
-          >
-            <Settings className="w-5 h-5" />
-          </Button>
           <Button
             onClick={() => setShowAddForm(true)}
             className="rounded-full w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 shadow-lg"
