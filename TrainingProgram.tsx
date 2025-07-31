@@ -24,7 +24,7 @@ interface TrainingProgramProps {
     date: string,
     workoutId?: string,
     start?: string,
-  duration?: string
+    duration?: string
   ) => void
   onDeleteClient?: (clientId: string) => void
   allowEdit?: boolean

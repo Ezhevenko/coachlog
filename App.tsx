@@ -217,6 +217,8 @@ export default function App() {
           onOpenTraining={openTrainingMode}
           onOpenEdit={openEditMode}
           onDeleteClient={deleteClientAndReturn}
+          allowEdit={activeRole === 'coach'}
+          canStart={activeRole === 'coach'}
         />
       )}
 
