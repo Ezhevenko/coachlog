@@ -14,10 +14,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(400).json({ error: 'initData required' });
     return;
   }
-  // parse Telegram user ID from initData
+
+  // verify Telegram initData signature and extract user id
   let telegram_id: string;
   try {
     const params = new URLSearchParams(initData);
+    const hash = params.get('hash');
+    if (!hash) throw new Error('missing hash');
+    params.delete('hash');
+    const dataCheckString = [...params.entries()]
+      .map(([k, v]) => `${k}=${v}`)
+      .sort()
+      .join('\n');
+    const botToken = process.env.TELEGRAM_BOT_TOKEN || '';
+    const secret = crypto
+      .createHmac('sha256', 'WebAppData')
+      .update(botToken)
+      .digest();
+    const computed = crypto
+      .createHmac('sha256', secret)
+      .update(dataCheckString)
+      .digest('hex');
+    if (computed !== hash) {
+      throw new Error('invalid hash');
+    }
     const userStr = params.get('user');
     if (!userStr) throw new Error('missing user');
     const userObj = JSON.parse(userStr);

@@ -11,12 +11,14 @@ Requires **Node.js 18** or **Node.js 20**.
    npm install
    ```
 2. Copy `.env.example` to `.env` and configure your credentials:
-   ```env
-   JWT_SECRET=changeme
-   SUPABASE_URL=https://your-project.supabase.co
-   SUPABASE_SERVICE_ROLE_KEY=service_role_key
-   NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
-   ```
+ ```env
+  JWT_SECRET=changeme
+  SUPABASE_URL=https://your-project.supabase.co
+  SUPABASE_SERVICE_ROLE_KEY=service_role_key
+  NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
+  ```
+
+Replace the default `JWT_SECRET` value with a strong secret before deploying the application.
 
 `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` must be provided for production builds.
 `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` should be the bot's username without the `@`.
