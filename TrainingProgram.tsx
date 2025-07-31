@@ -3,7 +3,7 @@ import { useApiFetch } from './lib/api'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import WorkoutCalendar from './components/WorkoutCalendar'
-import { ArrowLeft, Trash2 } from 'lucide-react@0.487.0'
+import { Trash2 } from 'lucide-react@0.487.0'
 import type { Client } from './App'
 import { ClientPackage } from './ClientPackage'
 const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
@@ -70,14 +70,6 @@ export function TrainingProgram({
       {!hideHeader && (
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
-            <Button
-              onClick={onBack}
-              variant="ghost"
-              size="icon"
-              className="hover:bg-blue-100"
-            >
-              <ArrowLeft className="w-6 h-6" />
-            </Button>
             <div>
               <h1 className="text-lg font-bold text-gray-800">{client.name}</h1>
               <p className="text-sm text-blue-600">Программа тренировок</p>
