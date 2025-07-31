@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Calendar } from '../ui/calendar'
 import { Card } from '../ui/card'
+import { Button } from '../ui/button'
+import { Plus } from 'lucide-react@0.487.0'
 import { WorkoutCard } from '../WorkoutCard'
 import { useApiFetch } from '../lib/api'
 import type { Client } from '../App'
@@ -73,6 +75,8 @@ export function WorkoutCalendar({
 
   const clientMap = Object.fromEntries(clients.map(c => [c.id, c])) as Record<string, Client>
 
+  const selectedClient = clientId ? clientMap[clientId] : undefined
+
   const hasTrainingOnDate = (date: Date) => {
     const key = toDateKey(date)
     return (workoutsByDate[key]?.length || 0) > 0
@@ -100,6 +104,19 @@ export function WorkoutCalendar({
       <div className="space-y-3">
         {sortedWorkouts.length === 0 && (
           <p className="text-center text-gray-500">Нет тренировок</p>
+        )}
+        {onOpenEdit && selectedClient && (
+          <div className="text-center">
+            <Button
+              onClick={() =>
+                onOpenEdit(selectedClient, selectedDayName, selectedDateStr)
+              }
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Добавить тренировку
+            </Button>
+          </div>
         )}
         {sortedWorkouts.map(w => {
           const client = clientMap[w.clientId]
