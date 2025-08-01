@@ -68,7 +68,34 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
     let inviteToken: string | null = null;
     if (!telegram_id) {
       inviteToken = crypto.randomUUID();
-      await supabase.from('client_invites').insert({ token: inviteToken, client_id: id, coach_id: coachId });
+      await supabase
+        .from('client_invites')
+        .insert({ token: inviteToken, client_id: id, coach_id: coachId });
+
+      const botToken = process.env.BOT_TOKEN;
+      const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
+      const webAppUrl = process.env.WEBAPP_URL || 'https://coachlog.vercel.app';
+      const coachTelegramId = req.user.telegram_id;
+
+      if (botToken && coachTelegramId && !coachTelegramId.startsWith('pending:')) {
+        const inviteLink = botUsername
+          ? `https://t.me/${botUsername}?startapp=invite_${inviteToken}`
+          : `${webAppUrl}/invite/${inviteToken}`;
+        const resp = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: coachTelegramId,
+            text: 'Перешлите ссылку клиенту:',
+            reply_markup: {
+              inline_keyboard: [[{ text: 'Присоединиться', url: inviteLink }]],
+            },
+          }),
+        });
+        if (!resp.ok) {
+          console.error('Failed to send invite link', await resp.text());
+        }
+      }
     }
     res.status(200).json({ ...created, inviteToken });
   } else {
