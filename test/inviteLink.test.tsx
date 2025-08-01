@@ -1,5 +1,6 @@
 process.env.MOCK_SUPABASE = '1'
 process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME = 'mybot'
+process.env.NEXT_PUBLIC_TELEGRAM_APP_NAME = 'MyApp'
 import { JSDOM } from 'jsdom'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
@@ -32,7 +33,7 @@ async function run() {
   await new Promise(res => setTimeout(res, 50))
   
   const text = document.body.textContent || ''
-  if (!text.includes('https://t.me/mybot?startapp=invite_tok123')) {
+  if (!text.includes('https://t.me/mybot/MyApp?startapp=invite_tok123')) {
     throw new Error('invite link not rendered')
   }
   console.log('Invite link rendered')

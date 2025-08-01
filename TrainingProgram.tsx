@@ -7,6 +7,7 @@ import { ArrowLeft, Trash2 } from 'lucide-react@0.487.0'
 import type { Client } from './App'
 import { ClientPackage } from './ClientPackage'
 const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
+const appName = process.env.NEXT_PUBLIC_TELEGRAM_APP_NAME
 
 interface TrainingProgramProps {
   client: Client
@@ -57,8 +58,9 @@ export function TrainingProgram({
       if (!res.ok) return
       const data = await res.json()
       if (data.token) {
+        const telegramPath = botUsername && appName ? `${botUsername}/${appName}` : botUsername
         const link = botUsername
-          ? `https://t.me/${botUsername}?startapp=invite_${data.token}`
+          ? `https://t.me/${telegramPath}?startapp=invite_${data.token}`
           : `${window.location.origin}/invite/${data.token}`
         setInviteLink(link)
       }

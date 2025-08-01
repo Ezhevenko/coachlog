@@ -74,12 +74,14 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
 
       const botToken = process.env.BOT_TOKEN;
       const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
+      const appName = process.env.NEXT_PUBLIC_TELEGRAM_APP_NAME;
       const webAppUrl = process.env.WEBAPP_URL || 'https://coachlog.vercel.app';
       const coachTelegramId = req.user.telegram_id;
 
       if (botToken && coachTelegramId && !coachTelegramId.startsWith('pending:')) {
+        const telegramPath = botUsername && appName ? `${botUsername}/${appName}` : botUsername;
         const inviteLink = botUsername
-          ? `https://t.me/${botUsername}?startapp=invite_${inviteToken}`
+          ? `https://t.me/${telegramPath}?startapp=invite_${inviteToken}`
           : `${webAppUrl}/invite/${inviteToken}`;
         const resp = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
           method: 'POST',

@@ -5,6 +5,7 @@ import App from '../../App'
 import { Button } from '../../ui/button'
 
 const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
+const appName = process.env.NEXT_PUBLIC_TELEGRAM_APP_NAME
 
 export default function InvitePage() {
   const router = useRouter()
@@ -33,7 +34,8 @@ export default function InvitePage() {
 
     if (!(window as any).Telegram?.WebApp) {
       if (botUsername) {
-        window.location.href = `https://t.me/${botUsername}?startapp=invite_${inviteToken}`
+        const telegramPath = botUsername && appName ? `${botUsername}/${appName}` : botUsername
+        window.location.href = `https://t.me/${telegramPath}?startapp=invite_${inviteToken}`
       }
       return
     }

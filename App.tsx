@@ -19,6 +19,7 @@ import {
 import { ClientSettings } from './ClientSettings'
 
 const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
+const appName = process.env.NEXT_PUBLIC_TELEGRAM_APP_NAME
 
 export interface Exercise {
   id: string
@@ -123,8 +124,9 @@ export default function App() {
     }
     setClients(prev => [...prev, newClient])
     if (data.inviteToken) {
+      const telegramPath = botUsername && appName ? `${botUsername}/${appName}` : botUsername
       const link = botUsername
-        ? `https://t.me/${botUsername}?startapp=invite_${data.inviteToken}`
+        ? `https://t.me/${telegramPath}?startapp=invite_${data.inviteToken}`
         : `${window.location.origin}/invite/${data.inviteToken}`
       window.prompt('Invite link', link)
     }
