@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Card } from './ui/card'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger
+} from './ui/collapsible'
+import { ChevronDown } from 'lucide-react@0.487.0'
+import { cn } from './ui/utils'
 import { useApiFetch } from './lib/api'
 import type { Client, Exercise } from './App'
 
@@ -53,24 +60,34 @@ export function ProgressView({ client, allExercises }: ProgressViewProps) {
   return (
     <div className="space-y-4">
       {exercises.map(ex => (
-        <Card key={ex.name} className="p-4 bg-white shadow-sm border-0">
-          <h3 className="font-medium text-gray-800 mb-2">{ex.name}</h3>
-          {ex.history.length === 0 ? (
-            <p className="text-sm text-gray-500">Нет записей</p>
-          ) : (
-            <div className="space-y-1 text-sm text-gray-700 max-h-32 overflow-y-auto">
-              {ex.history.map((rec, idx) => (
-                <div key={idx} className="flex justify-between">
-                  <span className="text-gray-500">{rec.date}</span>
-                  <span className="font-medium">
-                    {rec.weight} кг
-                    {rec.reps ? ` × ${rec.reps}` : ''}
-                    {rec.round !== undefined ? ` (круг ${rec.round})` : ''}
-                  </span>
+        <Card key={ex.name} className="p-0 bg-white shadow-sm border-0 overflow-hidden">
+          <Collapsible>
+            <CollapsibleTrigger className={cn(
+              'w-full px-4 py-3 flex items-center justify-between hover:bg-blue-50',
+              'text-left'
+            )}>
+              <span className="font-medium text-gray-800">{ex.name}</span>
+              <ChevronDown className="w-4 h-4 transition-transform data-[state=open]:rotate-180" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="px-4 pb-4">
+              {ex.history.length === 0 ? (
+                <p className="text-sm text-gray-500">Нет записей</p>
+              ) : (
+                <div className="space-y-1 text-sm text-gray-700 max-h-32 overflow-y-auto">
+                  {ex.history.map((rec, idx) => (
+                    <div key={idx} className="flex justify-between">
+                      <span className="text-gray-500">{rec.date}</span>
+                      <span className="font-medium">
+                        {rec.weight} кг
+                        {rec.reps ? ` × ${rec.reps}` : ''}
+                        {rec.round !== undefined ? ` (круг ${rec.round})` : ''}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
+              )}
+            </CollapsibleContent>
+          </Collapsible>
         </Card>
       ))}
       {exercises.length === 0 && (
