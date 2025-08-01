@@ -76,7 +76,7 @@ export function ClientPackage({
               onChange={e => setDelta(e.target.value)}
               className="flex-1 border-gray-200 focus:border-blue-300"
             />
-            <Button onClick={handleSave} disabled={!delta}>Сохранить</Button>
+            <Button onClick={handleSave} disabled={!delta}>Начислить</Button>
           </div>
         )}
         {info.history.length > 0 && (
