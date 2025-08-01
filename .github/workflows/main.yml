@@ -1,0 +1,32 @@
+name: Set Telegram Webhook
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  set-webhook:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Set Telegram Webhook
+        run: pnpm run set-webhook
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          WEBHOOK_URL: https://coachlog.vercel.app/api/telegram-webhook
