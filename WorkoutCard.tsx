@@ -4,6 +4,8 @@ import { Play, Edit3 } from 'lucide-react@0.487.0'
 
 interface WorkoutCardProps {
   clientName?: string
+  date?: string
+  dayName?: string
   startTime?: string
   duration?: string | number
   exerciseCount?: number
@@ -14,6 +16,8 @@ interface WorkoutCardProps {
 
 export function WorkoutCard({
   clientName,
+  date,
+  dayName,
   startTime,
   duration,
   exerciseCount,
@@ -21,21 +25,21 @@ export function WorkoutCard({
   onEdit,
   hideName = false
 }: WorkoutCardProps) {
+  const infoParts: string[] = []
+  if (date) infoParts.push(date)
+  if (dayName) infoParts.push(dayName)
+  if (startTime) infoParts.push(startTime)
+  if (duration) infoParts.push(`${duration} мин`)
+  if (typeof exerciseCount === 'number') infoParts.push(`${exerciseCount} упр.`)
   return (
     <Card className="flex items-center justify-between p-4 bg-white shadow-sm border-0">
       <div className="flex items-center gap-2 text-sm text-gray-600">
         {!hideName && clientName && (
           <h3 className="font-medium text-gray-800 mr-2">{clientName}</h3>
         )}
-        {startTime && <span>{startTime}</span>}
-        {duration && (
-          <span>
-            {duration} мин
-          </span>
-        )}
-        {typeof exerciseCount === 'number' && (
-          <span>{exerciseCount} упр.</span>
-        )}
+        {infoParts.map((p, idx) => (
+          <span key={idx}>{idx > 0 ? ', ' : ''}{p}</span>
+        ))}
       </div>
       <div className="flex gap-2">
         {onStart && (

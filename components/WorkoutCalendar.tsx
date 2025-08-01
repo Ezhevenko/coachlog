@@ -6,7 +6,7 @@ import { Plus } from 'lucide-react@0.487.0'
 import { WorkoutCard } from '../WorkoutCard'
 import { useApiFetch } from '../lib/api'
 import type { Client } from '../App'
-import { WEEKDAYS, toDateKey } from '../lib/dateUtils'
+import { WEEKDAYS, toDateKey, formatDateRu, getWeekday } from '../lib/dateUtils'
 
 interface Workout {
   id: string
@@ -121,10 +121,14 @@ export function WorkoutCalendar({
         {sortedWorkouts.map(w => {
           const client = clientMap[w.clientId]
           if (!client) return null
+          const dateText = formatDateRu(w.date)
+          const day = getWeekday(w.date)
           return (
             <WorkoutCard
               key={w.id}
               clientName={hideClientName ? undefined : client.name}
+              date={dateText}
+              dayName={day}
               startTime={w.time_start ? w.time_start.slice(0, 5) : undefined}
               onStart={
                 onOpenTraining
