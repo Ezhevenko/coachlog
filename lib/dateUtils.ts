@@ -12,3 +12,14 @@ export function toDateKey(date: Date) {
   const tzOffset = date.getTimezoneOffset() * 60000
   return new Date(date.getTime() - tzOffset).toISOString().slice(0, 10)
 }
+
+export function formatDateRu(date: string) {
+  return new Date(date).toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long'
+  })
+}
+
+export function getWeekday(date: string) {
+  return WEEKDAYS[new Date(date).getDay()]
+}
