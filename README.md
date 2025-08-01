@@ -16,6 +16,7 @@ Requires **Node.js 18** or **Node.js 20**.
   SUPABASE_URL=https://your-project.supabase.co
   SUPABASE_SERVICE_ROLE_KEY=service_role_key
   NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
+  NEXT_PUBLIC_TELEGRAM_APP_NAME=
   BOT_TOKEN=
   TELEGRAM_BOT_TOKEN=
   WEBAPP_URL=
@@ -25,6 +26,7 @@ Replace the default `JWT_SECRET` value with a strong secret before deploying the
 
 `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` must be provided for production builds.
 `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` should be the bot's username without the `@`.
+`NEXT_PUBLIC_TELEGRAM_APP_NAME` should be the path segment of your mini app, if any.
 `BOT_TOKEN` and `TELEGRAM_BOT_TOKEN` are Telegram API tokens for bot authentication.
 `WEBAPP_URL` is the public URL where the app will be deployed.
 
