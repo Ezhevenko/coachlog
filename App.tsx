@@ -305,6 +305,7 @@ export default function App() {
                 <TabsTrigger
                   value="calendar"
                   className="flex flex-col items-center justify-center gap-1 h-full text-sm"
+                  onClick={() => setCurrentView('calendar')}
                 >
                   <CalendarIcon className="w-6 h-6" />
                   <span className="text-sm">Календарь</span>
@@ -312,6 +313,7 @@ export default function App() {
                 <TabsTrigger
                   value="clients"
                   className="flex flex-col items-center justify-center gap-1 h-full text-sm"
+                  onClick={() => setCurrentView('clients')}
                 >
                   <Users className="w-6 h-6" />
                   <span className="text-sm">Клиенты</span>
@@ -319,6 +321,7 @@ export default function App() {
                 <TabsTrigger
                   value="settings"
                   className="flex flex-col items-center justify-center gap-1 h-full text-sm"
+                  onClick={() => setCurrentView('settings')}
                 >
                   <Settings className="w-6 h-6" />
                   <span className="text-sm">Настройки</span>
@@ -336,6 +339,7 @@ export default function App() {
                 <TabsTrigger
                   value="client-schedule"
                   className="flex flex-col items-center justify-center gap-1 h-full text-sm"
+                  onClick={() => setCurrentView('client-schedule')}
                 >
                   <CalendarIcon className="w-6 h-6" />
                   <span className="text-sm">Расписание</span>
@@ -343,6 +347,7 @@ export default function App() {
                 <TabsTrigger
                   value="client-progress"
                   className="flex flex-col items-center justify-center gap-1 h-full text-sm"
+                  onClick={() => setCurrentView('client-progress')}
                 >
                   <TrendingUp className="w-6 h-6" />
                   <span className="text-sm">Прогресс</span>
@@ -350,6 +355,7 @@ export default function App() {
                 <TabsTrigger
                   value="client-settings"
                   className="flex flex-col items-center justify-center gap-1 h-full text-sm"
+                  onClick={() => setCurrentView('client-settings')}
                 >
                   <Settings className="w-6 h-6" />
                   <span className="text-sm">Настройки</span>
