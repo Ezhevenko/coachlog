@@ -13,7 +13,7 @@ function rr(user: string): RR {
 async function run() {
   await supabase.from('users').update({ telegram_id: 'tg1' }).eq('id', 'user1')
   await supabase.from('users').insert({ id: 'u2', telegram_id: 'tg1' })
-  const { req, res } = rr('u2')
+  const { req, res } = rr('user1')
   await handler(req as any, res as any)
   if (res.statusCode !== 200) throw new Error('request failed')
   if (!Array.isArray(res.body) || res.body[0]?.id !== 'c1') throw new Error('clients not returned')

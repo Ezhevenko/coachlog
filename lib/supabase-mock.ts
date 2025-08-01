@@ -74,7 +74,12 @@ export function createMockSupabase() {
           return o
         })
       }
-      if (this.singleRow) data = rows[0] || null
+      if (this.singleRow) {
+        if (rows.length > 1) {
+          return { data: null, error: { message: 'Multiple rows returned' } }
+        }
+        data = rows[0] || null
+      }
       return { data, error: null }
     }
   }
