@@ -17,12 +17,14 @@ async function handler(req: NextApiRequest & { user: any }, res: NextApiResponse
   if (workout.coach_id !== req.user.id) { res.status(403).end(); return }
   if (workout.package_deducted) { res.status(200).json({}); return }
 
-  const { data: pkg } = await supabase
+  const { data: pkg, error } = await supabase
     .from('client_packages')
     .select('id,count')
     .eq('client_id', workout.client_id)
     .eq('coach_id', workout.coach_id)
     .single()
+  if (error) { res.status(500).json({ error: error.message }); return }
+  if (!pkg) { res.status(404).json({ error: 'package not found' }); return }
   if (pkg) {
     await supabase
       .from('client_packages')
