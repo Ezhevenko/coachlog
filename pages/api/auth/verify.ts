@@ -17,6 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // verify Telegram initData signature and extract user id
   let telegram_id: string;
+  let fullName: string;
   try {
     const params = new URLSearchParams(initData);
     const hash = params.get('hash');
@@ -42,6 +43,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!userStr) throw new Error('missing user');
     const userObj = JSON.parse(userStr);
     telegram_id = String(userObj.id);
+    fullName =
+      userObj.username ||
+      [userObj.first_name, userObj.last_name].filter(Boolean).join(' ') ||
+      `User ${telegram_id}`;
   } catch (e) {
     res.status(400).json({ error: 'invalid initData' });
     return;
@@ -64,7 +69,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     const { error: updateError } = await supabase
       .from('users')
-      .update({ telegram_id })
+      .update({ telegram_id, full_name: fullName })
       .eq('id', invite.client_id);
     if (updateError) {
       res.status(400).json({ error: updateError.message });
@@ -88,7 +93,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!user) {
       const { data: created, error } = await supabase
         .from('users')
-        .insert({ telegram_id, full_name: `User ${telegram_id}` })
+        .insert({ telegram_id, full_name: fullName })
         .select()
         .single();
       if (error || !created) {
