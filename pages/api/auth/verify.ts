@@ -53,14 +53,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   let user;
   if (inviteToken) {
-    const { data: invite, error } = await supabase
+    const { data: invite, error: inviteError } = await supabase
       .from('client_invites')
       .select('client_id')
       .eq('token', inviteToken)
       .single();
-    if (error) {
-      console.error('Invite lookup error', error);
-      res.status(500).json({ error: 'database error' });
+    if (inviteError && inviteError.code !== 'PGRST116') {
+      console.error('Invite lookup error', inviteError);
+      res.status(500).json({ error: inviteError.message });
       return;
     }
     if (!invite) {
@@ -72,48 +72,118 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .update({ telegram_id, full_name: fullName })
       .eq('id', invite.client_id);
     if (updateError) {
+      console.error('User update error', updateError);
       res.status(400).json({ error: updateError.message });
       return;
     }
-    await supabase.from('client_invites').delete().eq('token', inviteToken);
-    const { data } = await supabase.from('users').select('*').eq('id', invite.client_id).single();
+    const { error: deleteError } = await supabase
+      .from('client_invites')
+      .delete()
+      .eq('token', inviteToken);
+    if (deleteError) {
+      console.error('Invite delete error', deleteError);
+      res.status(500).json({ error: deleteError.message });
+      return;
+    }
+    const { data, error: userFetchError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', invite.client_id)
+      .single();
+    if (userFetchError) {
+      console.error('User fetch error', userFetchError);
+      res.status(500).json({ error: userFetchError.message });
+      return;
+    }
     user = data;
-    const { data: hasRole } = await supabase
+    const { data: hasRole, error: roleLookupError } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', invite.client_id)
       .eq('role', 'client')
       .single();
+    if (roleLookupError && roleLookupError.code !== 'PGRST116') {
+      console.error('Role lookup error', roleLookupError);
+      res.status(500).json({ error: roleLookupError.message });
+      return;
+    }
     if (!hasRole) {
-      await supabase.from('user_roles').insert({ user_id: invite.client_id, role: 'client' });
+      const { error: roleInsertError } = await supabase
+        .from('user_roles')
+        .insert({ user_id: invite.client_id, role: 'client' });
+      if (roleInsertError) {
+        console.error('Role insert error', roleInsertError);
+        res.status(500).json({ error: roleInsertError.message });
+        return;
+      }
     }
   } else {
-    const { data } = await supabase.from('users').select('*').eq('telegram_id', telegram_id).single();
+    const { data, error: userLookupError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('telegram_id', telegram_id)
+      .single();
+    if (userLookupError && userLookupError.code !== 'PGRST116') {
+      console.error('User lookup error', userLookupError);
+      res.status(500).json({ error: userLookupError.message });
+      return;
+    }
     user = data;
     if (!user) {
-      const { data: created, error } = await supabase
+      const { data: created, error: createError } = await supabase
         .from('users')
         .insert({ telegram_id, full_name: fullName })
         .select()
         .single();
-      if (error || !created) {
-        res.status(500).json({ error: error?.message || 'Failed to create user' });
+      if (createError || !created) {
+        console.error('User create error', createError);
+        res.status(500).json({ error: createError?.message || 'Failed to create user' });
         return;
       }
       user = created;
-      await supabase.from('user_roles').insert([{ user_id: user.id, role: 'coach' }, { user_id: user.id, role: 'client' }]);
+      const { error: rolesInsertError } = await supabase
+        .from('user_roles')
+        .insert([
+          { user_id: user.id, role: 'coach' },
+          { user_id: user.id, role: 'client' },
+        ]);
+      if (rolesInsertError) {
+        console.error('Role assignment error', rolesInsertError);
+        res.status(500).json({ error: rolesInsertError.message });
+        return;
+      }
     }
   }
-  const { data: rolesData } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
+  const { data: rolesData, error: rolesError } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', user.id);
+  if (rolesError) {
+    console.error('Roles fetch error', rolesError);
+    res.status(500).json({ error: rolesError.message });
+    return;
+  }
   const roles = rolesData?.map(r => r.role) || ['coach'];
-  let { data: active } = await supabase
+  let { data: active, error: activeError } = await supabase
     .from('active_roles')
     .select('active_role')
     .eq('user_id', user.id)
     .single();
+  if (activeError && activeError.code !== 'PGRST116') {
+    console.error('Active role fetch error', activeError);
+    res.status(500).json({ error: activeError.message });
+    return;
+  }
   if (!active) {
     active = { active_role: 'coach' };
-    await supabase.from('active_roles').insert({ user_id: user.id, active_role: 'coach' });
+    const { error: setActiveError } = await supabase
+      .from('active_roles')
+      .insert({ user_id: user.id, active_role: 'coach' });
+    if (setActiveError) {
+      console.error('Active role insert error', setActiveError);
+      res.status(500).json({ error: setActiveError.message });
+      return;
+    }
   }
   const responseUser = { id: user.id, telegram_id: user.telegram_id, full_name: user.full_name, roles, activeRole: active.active_role };
   const token = signToken(user.id);
