@@ -11,8 +11,14 @@ export function createMockSupabase() {
     package_history: [],
     exercise_progress: [],
     active_roles: [],
-    client_invites: []
+    client_invites: [],
+    announcements: [],
+    announcement_moderation_feedback: [],
+    user_subscriptions: [],
+    residential_complexes: []
   }
+
+  const storageBuckets: Record<string, Record<string, any>> = {}
 
   class Query {
     table: any[]
@@ -90,6 +96,26 @@ export function createMockSupabase() {
       const q = new Query(table)
       ;(q as any).tableName = tableName
       return q
+    },
+    storage: {
+      from(bucket: string) {
+        const store = (storageBuckets[bucket] = storageBuckets[bucket] || {})
+        return {
+          async upload(path: string, data: any, options?: { contentType?: string; upsert?: boolean }) {
+            if (!options?.upsert && Object.prototype.hasOwnProperty.call(store, path)) {
+              return { data: null, error: { message: 'duplicate key value violates unique constraint' } }
+            }
+            store[path] = { data, contentType: options?.contentType }
+            return { data: { path }, error: null }
+          },
+          async list(prefix?: string) {
+            const entries = Object.entries(store)
+              .filter(([key]) => (prefix ? key.startsWith(prefix) : true))
+              .map(([name, meta]) => ({ name, metadata: meta }))
+            return { data: entries, error: null }
+          }
+        }
+      }
     }
   }
 }
